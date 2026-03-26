@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('ADMIN', 'COORDINATOR', 'MODERATOR', 'VOLUNTAREER', 'PYME_MANAGER');
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'COORDINATOR', 'MODERATOR', 'VOLUNTEER', 'PYME_MANAGER');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -7,11 +7,18 @@ CREATE TABLE "User" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" "Role" NOT NULL DEFAULT 'VOLUNTAREER',
     "isActive" BOOLEAN NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "UserRole" (
+    "userId" INTEGER NOT NULL,
+    "role" "Role" NOT NULL,
+
+    CONSTRAINT "UserRole_pkey" PRIMARY KEY ("userId","role")
 );
 
 -- CreateTable
@@ -27,6 +34,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Voluntareer_userId_key" ON "Voluntareer"("userId");
+
+-- AddForeignKey
+ALTER TABLE "UserRole" ADD CONSTRAINT "UserRole_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Voluntareer" ADD CONSTRAINT "Voluntareer_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

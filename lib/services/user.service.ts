@@ -10,7 +10,6 @@ export class UserService {
 
     //hashear contraseña
     userDto.password= await bcrypt.hash(userDto.password,10);
-
     //Utiliza prisma
     const created = await prisma.user.create({
         //mapea el dto a la entidad
