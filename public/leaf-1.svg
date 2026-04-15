@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 200" fill="none">
+  <!-- Tropical elongated leaf -->
+  <defs>
+    <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4CC764"/>
+      <stop offset="50%" stop-color="#2D9B3E"/>
+      <stop offset="100%" stop-color="#1B7A2A"/>
+    </linearGradient>
+  </defs>
+  <path d="M60 5 C40 20, 8 65, 6 110 C4 145, 18 170, 40 188 C48 194, 55 197, 60 198 C65 197, 72 194, 80 188 C102 170, 116 145, 114 110 C112 65, 80 20, 60 5Z" fill="url(#lg1)"/>
+  <path d="M60 12 L60 192" stroke="#1E6B2E" stroke-width="2" stroke-linecap="round"/>
+  <path d="M60 35 Q40 42 18 55" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M60 35 Q80 42 102 55" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M60 65 Q35 75 12 92" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M60 65 Q85 75 108 92" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M60 95 Q38 108 15 128" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M60 95 Q82 108 105 128" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M60 125 Q42 140 25 158" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M60 125 Q78 140 95 158" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M60 155 Q48 168 38 180" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M60 155 Q72 168 82 180" stroke="#1E6B2E" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <!-- Highlight -->
+  <path d="M60 8 C45 22, 15 68, 12 112 C10 140, 22 165, 42 182 C50 189, 57 193, 60 195" fill="#5ADA6E" opacity="0.25"/>
+</svg>

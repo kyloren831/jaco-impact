@@ -1,16 +1,21 @@
-import { User } from "@/generated/prisma/browser";
-import { UserRequest } from "../dtos/users/user-request.dto"
-import { isAscii } from "buffer";
-import { UserResponse } from "../dtos/users/user-response.dto";
+import type { User } from "@/generated/prisma/client";
+import { CreateUserDTO } from "../validators/user.validator";
+
+export type UserResponse = {
+    id: number;
+    name: string;
+    email: string;
+    isActive: boolean;
+};
 
 export class UserMapper{
-    static toEntity (userDto : UserRequest) : Omit<User,'id' | 'createdAt'> {
+    static toEntity (userDto : CreateUserDTO) : Omit<User,'id' | 'createdAt'> {
         return {
             name:userDto.name,
             email:userDto.email,
             password:userDto.password,
-            role:userDto.role,
-            isActive:userDto.isActive
+            isActive:userDto.isActive ?? true,
+            imageUrl: ""
         }
     }
 
@@ -19,7 +24,6 @@ export class UserMapper{
             id:user.id,
             name:user.name,
             email:user.email,
-            role:user.role,
             isActive:user.isActive
         }
     }

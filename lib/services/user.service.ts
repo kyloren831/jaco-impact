@@ -1,26 +1,63 @@
-import { prisma } from "../prisma";
-import { UserRequest } from "../dtos/users/user-request.dto";
-import { UserResponse } from "../dtos/users/user-response.dto";
-import { UserMapper } from "../mappers/user.mapper";
-import bcrypt from 'bcryptjs';
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import { CreateUserDTO } from "@/lib/validators/user.validator";
 
 export class UserService {
-    //Meotodo para crear usuario nuevo 
-  async create(userDto: UserRequest): Promise<UserResponse> {
+  /**
+   * Registra un nuevo usuario visitante en el sistema.
+   * Crea automáticamente el rol de VOLUNTEER y un perfil vacío de Volunteer.
+   */
+  async create(data: CreateUserDTO) {
+    const { name, email, password, isActive } = data;
 
-    //hashear contraseña
-    userDto.password= await bcrypt.hash(userDto.password,10);
-    //Utiliza prisma
-    const created = await prisma.user.create({
-        //mapea el dto a la entidad
-      data: UserMapper.toEntity(userDto),
+    // Verificar si el usuario ya existe
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
     });
-    //retorna la entidad mapeada al dto
-    return UserMapper.toDto(created);
+
+    if (existingUser) {
+      throw new Error("EMAIL_ALREADY_EXISTS");
+    }
+
+    // Hashear la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Crear el usuario, asignar rol VOLUNTEER e inicializar info del volunteer en la misma transacción
+    const created = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        imageUrl: "",
+        isActive: isActive ?? true,
+        userRoles: {
+          create: {
+            role: "VOLUNTEER",
+          },
+        },
+        volunteers: {
+          create: {
+            // Inicializar con valores vacíos, el usuario podrá completar su perfil más adelante
+            phone: "",
+            nationality: "",
+            profession: "",
+            emergencyContactName: "",
+            emergencyContactPhone: "",
+            inmediateAvailability: false,
+          },
+        },
+      },
+      include: {
+        userRoles: true,
+        volunteers: true,
+      },
+    });
+
+    // Excluir contraseña de la respuesta
+    const { password: _, ...userWithoutPassword } = created;
+
+    return userWithoutPassword;
   }
-  
-  async findAll(): Promise<UserResponse[]> {
-    const users = await prisma.user.findMany();
-    return users.map(UserMapper.toDto);
-  }
+
+  // Se pueden agregar otros métodos del servicio (e.g., findAll, update etc) según se requieran
 }

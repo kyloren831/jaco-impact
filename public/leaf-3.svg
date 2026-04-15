@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220" fill="none">
+  <!-- Palm/banana style broader leaf -->
+  <defs>
+    <linearGradient id="lg3" x1="0.3" y1="0" x2="0.7" y2="1">
+      <stop offset="0%" stop-color="#48C95E"/>
+      <stop offset="50%" stop-color="#2EA843"/>
+      <stop offset="100%" stop-color="#1A7A2C"/>
+    </linearGradient>
+  </defs>
+  <path d="M80 3 C55 15, 5 65, 3 120 C2 155, 18 190, 50 208 C60 214, 70 218, 80 220 C90 218, 100 214, 110 208 C142 190, 158 155, 157 120 C155 65, 105 15, 80 3Z" fill="url(#lg3)"/>
+  <!-- Center stem (thick) -->
+  <path d="M80 8 L80 215" stroke="#1E6B2E" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Pinnate veins (many, close together) -->
+  <path d="M80 25 Q60 28 22 42" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 25 Q100 28 138 42" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 42 Q55 48 15 65" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 42 Q105 48 145 65" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 58 Q52 66 10 88" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 58 Q108 66 150 88" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 75 Q50 85 8 110" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 75 Q110 85 152 110" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 92 Q50 105 7 130" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 92 Q110 105 153 130" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 110 Q52 125 12 150" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 110 Q108 125 148 150" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 128 Q55 145 20 168" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 128 Q105 145 140 168" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 148 Q60 162 32 182" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 148 Q100 162 128 182" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 168 Q65 180 48 195" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 168 Q95 180 112 195" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 188 Q72 196 60 206" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M80 188 Q88 196 100 206" stroke="#1E6B2E" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <!-- Highlight side -->
+  <path d="M80 6 C60 18, 12 68, 8 122 C6 152, 20 185, 52 204 C62 210, 72 215, 80 218" fill="#58D870" opacity="0.22"/>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" fill="none">
+  <!-- Monstera deliciosa leaf -->
+  <defs>
+    <linearGradient id="lg2" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#52D469"/>
+      <stop offset="40%" stop-color="#35A54A"/>
+      <stop offset="100%" stop-color="#1E7A30"/>
+    </linearGradient>
+  </defs>
+  <!-- Main shape with characteristic splits -->
+  <path d="M100 5 C65 12, 15 45, 8 95 C4 125, 20 155, 55 170 C72 176, 88 175, 100 170 C112 175, 128 176, 145 170 C180 155, 196 125, 192 95 C185 45, 135 12, 100 5Z" fill="url(#lg2)"/>
+  <!-- Monstera characteristic holes -->
+  <ellipse cx="55" cy="80" rx="12" ry="20" fill="#267534" opacity="0.35"/>
+  <ellipse cx="145" cy="80" rx="12" ry="20" fill="#267534" opacity="0.35"/>
+  <ellipse cx="48" cy="130" rx="10" ry="14" fill="#267534" opacity="0.3"/>
+  <ellipse cx="152" cy="130" rx="10" ry="14" fill="#267534" opacity="0.3"/>
+  <!-- Splits from edge -->
+  <path d="M30 65 Q42 72 55 60" stroke="#267534" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M170 65 Q158 72 145 60" stroke="#267534" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Center vein -->
+  <path d="M100 12 L100 165" stroke="#1B6228" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Veins -->
+  <path d="M100 40 Q75 48 30 58" stroke="#1B6228" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M100 40 Q125 48 170 58" stroke="#1B6228" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M100 75 Q72 88 25 105" stroke="#1B6228" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M100 75 Q128 88 175 105" stroke="#1B6228" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M100 110 Q78 125 42 145" stroke="#1B6228" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M100 110 Q122 125 158 145" stroke="#1B6228" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M100 140 Q85 152 65 162" stroke="#1B6228" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M100 140 Q115 152 135 162" stroke="#1B6228" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Highlight -->
+  <path d="M100 8 C72 15, 25 48, 15 95 C12 118, 22 148, 55 165 C70 172, 88 172, 100 168" fill="#62E87A" opacity="0.2"/>
+</svg>

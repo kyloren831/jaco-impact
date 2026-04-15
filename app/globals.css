@@ -10,6 +10,19 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-brand-verde: #45B85A;
+  --color-brand-turquesa: #13A79D;
+  --color-brand-azul: #25A9E0;
+  --color-brand-azul-oscuro: #1A7ABD;
+  --color-brand-rosa: #EB008B;
+  --color-brand-rojo: #ED242E;
+  --color-brand-amarillo: #D6DE21;
+
+  --animate-fade-in-up: fadeInUp 1s ease-out forwards;
+  --animate-fade-in: fadeIn 1s ease-out forwards;
+  --animate-pulse-subtle: pulseSubtle 2s infinite ease-in-out;
+  --animate-float: float 2s ease-in-out infinite;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +32,57 @@
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseSubtle {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  scroll-behavior: smooth;
 }
