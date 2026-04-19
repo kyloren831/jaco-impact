@@ -14,8 +14,7 @@ export function proxy(request: NextRequest) {
   // Rutas protegidas
   const isProtected =
     pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/volunteer");
+    pathname.startsWith("/admin");
 
   if (!isProtected) {
     return NextResponse.next();
@@ -36,5 +35,5 @@ export function proxy(request: NextRequest) {
 
 // Solo ejecutar en rutas que nos interesan
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/volunteer/:path*"],
+  matcher: ["/dashboard/:path*", "/admin/:path*"],
 };

@@ -1,9 +1,44 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { requireAuth, AuthError } from "@/lib/auth";
+import type { AccessTokenPayload } from "@/lib/auth";
 
-export default function VolunteerDashboard() {
+// ── Role-specific greeting & accent color ──────────────────────────
+function getRoleConfig(roles: string[]) {
+  if (roles.includes("ADMIN")) {
+    return { label: "Administrador", accent: "text-brand-rosa" };
+  }
+  if (roles.includes("COORDINATOR")) {
+    return { label: "Coordinador", accent: "text-brand-azul" };
+  }
+  if (roles.includes("MODERATOR")) {
+    return { label: "Moderador", accent: "text-brand-turquesa" };
+  }
+  if (roles.includes("PYME_MANAGER")) {
+    return { label: "Gestor PYME", accent: "text-brand-verde" };
+  }
+  // Default / VOLUNTEER
+  return { label: "Voluntario", accent: "text-brand-turquesa" };
+}
+
+export default async function DashboardPage() {
+  let user: AccessTokenPayload;
+
+  try {
+    user = await requireAuth();
+  } catch (err) {
+    if (err instanceof AuthError) {
+      redirect("/login");
+    }
+    throw err;
+  }
+
+  const userRoles = user.roles ?? [user.role];
+  const { label, accent } = getRoleConfig(userRoles);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header simple */}
+      {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
@@ -11,14 +46,17 @@ export default function VolunteerDashboard() {
               <div className="h-10 w-10 bg-brand-verde rounded-full flex items-center justify-center text-white font-bold text-xs">
                 Logo
               </div>
-              <h1 className="text-xl font-bold text-brand-azul-oscuro">Jaco Impact Dashboard</h1>
+              <h1 className="text-xl font-bold text-brand-azul-oscuro">
+                Jaco Impact Dashboard
+              </h1>
             </div>
-            <div>
+            <div className="flex items-center gap-4">
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                {label}
+              </span>
               <Link
-                href="/login"
+                href="/api/auth/logout"
                 className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
-                // Idealmente aquí iría un botón de cerrar sesión ("Logout") pero por simplicidad
-                // redirigimos a login como placeholder.
               >
                 Cerrar Sesión
               </Link>
@@ -31,14 +69,16 @@ export default function VolunteerDashboard() {
       <main className="flex-1 w-full max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center sm:text-left">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            ¡Hola, <span className="text-brand-turquesa">Voluntario!</span>
+            ¡Hola, <span className={accent}>{label}!</span>
           </h2>
           <p className="mt-4 text-lg text-gray-600 max-w-3xl">
-            Bienvenido a tu panel de control. Aquí podrás ver tus próximas actividades, tus registros de impacto y las últimas noticias de Jaco Impact. Pronto agregaremos más funcionalidades para ti.
+            Bienvenido a tu panel de control. Aquí podrás gestionar tu actividad
+            dentro de Jaco Impact. El contenido de este panel se adapta a tu rol.
           </p>
 
+          {/* Placeholder cards — se llenarán según el rol en el futuro */}
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Cards placeholder */}
+            {/* Card: Próximos Eventos */}
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-brand-verde/10 rounded-lg flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-brand-verde" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,9 +86,12 @@ export default function VolunteerDashboard() {
                 </svg>
               </div>
               <h3 className="text-lg font-bold text-gray-900">Próximos Eventos</h3>
-              <p className="mt-2 text-sm text-gray-500">Mantente al tanto de las próximas limpiezas de playa y talleres educativos.</p>
+              <p className="mt-2 text-sm text-gray-500">
+                Mantente al tanto de las próximas limpiezas de playa y talleres educativos.
+              </p>
             </div>
 
+            {/* Card: Mi Impacto */}
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-brand-azul/10 rounded-lg flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-brand-azul" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,9 +99,12 @@ export default function VolunteerDashboard() {
                 </svg>
               </div>
               <h3 className="text-lg font-bold text-gray-900">Mi Impacto</h3>
-              <p className="mt-2 text-sm text-gray-500">Revisa las horas de voluntariado que has acumulado y tu contribución anual.</p>
+              <p className="mt-2 text-sm text-gray-500">
+                Revisa las horas de voluntariado que has acumulado y tu contribución anual.
+              </p>
             </div>
 
+            {/* Card: Recursos */}
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-brand-rosa/10 rounded-lg flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-brand-rosa" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,9 +112,16 @@ export default function VolunteerDashboard() {
                 </svg>
               </div>
               <h3 className="text-lg font-bold text-gray-900">Recursos</h3>
-              <p className="mt-2 text-sm text-gray-500">Accede a guías y material educativo para mejorar tus habilidades.</p>
+              <p className="mt-2 text-sm text-gray-500">
+                Accede a guías y material educativo para mejorar tus habilidades.
+              </p>
             </div>
           </div>
+
+          {/* Role indicator for debugging — remove later */}
+          <p className="mt-8 text-xs text-gray-400">
+            Roles actuales: {userRoles.join(", ")}
+          </p>
         </div>
       </main>
     </div>

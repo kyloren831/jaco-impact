@@ -32,7 +32,7 @@ export default function LoginPage() {
       if (!res.ok) {
         setError(data.message || "Error al iniciar sesión");
       } else {
-        router.push("/volunteer/dashboard");
+        router.push("/dashboard");
         router.refresh();
       }
     } catch (err) {
