@@ -7,9 +7,22 @@ import PilaresSection from './_components/landing/PilaresSection';
 import GaleriaSection from './_components/landing/GaleriaSection';
 import CtaSection from './_components/landing/CtaSection';
 
-import { pilaresData, impactStatsData, actividadesData } from '@/lib/seed-data/landing';
+import { impactStatsData, actividadesData } from '@/lib/seed-data/landing';
+import { prisma } from '@/lib/prisma';
 
-export default function Home() {
+export default async function Home() {
+  const dbPillars = await prisma.pillar.findMany({
+    where: { isActive: true },
+    orderBy: { id: 'asc' },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      color: true,
+      iconUrl: true,
+    }
+  });
+
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -17,7 +30,7 @@ export default function Home() {
       <HeroSection />
       <AboutSection />
       <ImpactStatsSection stats={impactStatsData} />
-      <PilaresSection pilares={pilaresData} />
+      <PilaresSection pilares={dbPillars} />
       <GaleriaSection actividades={actividadesData} />
       <CtaSection />
 

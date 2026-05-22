@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { CreateUserDTO } from "@/lib/validators/user.validator";
+import { CreateUserDTO, AssignRoleDTO } from "@/lib/validators/user.validator";
 
 export class UserService {
   /**
@@ -59,5 +59,64 @@ export class UserService {
     return userWithoutPassword;
   }
 
-  // Se pueden agregar otros métodos del servicio (e.g., findAll, update etc) según se requieran
+  /**
+   * Asigna un rol a un usuario.
+   * Si el usuario ya tiene el rol, la operación es idempotente (no lanza error).
+   */
+  async assignRole({ userId, role }: AssignRoleDTO) {
+    // Verificar que el usuario existe
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    await prisma.userRole.upsert({
+      where: { userId_role: { userId, role } },
+      update: {},           // ya existe, no hacer nada
+      create: { userId, role },
+    });
+
+    // Devolver el usuario con sus roles actualizados
+    const updated = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      include: { userRoles: true },
+    });
+
+    const { password: _, ...userWithoutPassword } = updated;
+    return userWithoutPassword;
+  }
+
+  /**
+   * Elimina un rol de un usuario.
+   * Lanza error si el usuario no existe o si no tiene el rol asignado.
+   */
+  async removeRole({ userId, role }: AssignRoleDTO) {
+    // Verificar que el usuario existe
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    // Verificar que el rol está asignado
+    const existing = await prisma.userRole.findUnique({
+      where: { userId_role: { userId, role } },
+    });
+
+    if (!existing) {
+      throw new Error("ROLE_NOT_ASSIGNED");
+    }
+
+    await prisma.userRole.delete({
+      where: { userId_role: { userId, role } },
+    });
+
+    // Devolver el usuario con sus roles actualizados
+    const updated = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      include: { userRoles: true },
+    });
+
+    const { password: _, ...userWithoutPassword } = updated;
+    return userWithoutPassword;
+  }
 }

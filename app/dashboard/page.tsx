@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { requireAuth, AuthError } from "@/lib/auth";
 import type { AccessTokenPayload } from "@/lib/auth";
 
+import Navbar from "@/components/layout/Navbar";
+
 // ── Role-specific greeting & accent color ──────────────────────────
 function getRoleConfig(roles: string[]) {
   if (roles.includes("ADMIN")) {
@@ -37,7 +39,7 @@ export default async function DashboardPage() {
   const { label, accent } = getRoleConfig(userRoles);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,6 +126,6 @@ export default async function DashboardPage() {
           </p>
         </div>
       </main>
-    </div>
+    </>
   );
 }

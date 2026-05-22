@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     await setAuthCookies(accessToken, refreshToken);
 
     // ── 9. Responder ───────────────────────────────────────────────
-    return NextResponse.json({ message: "Login OK" });
+    return NextResponse.json({ message: "Login OK", role: primaryRole, roles });
   } catch (error) {
     console.error("[LOGIN ERROR]", error);
     return NextResponse.json(
