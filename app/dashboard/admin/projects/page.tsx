@@ -13,7 +13,7 @@ export default async function ProjectsPage() {
   return (
     <ProjectsClientView 
       projects={projects} 
-      pillars={pillars.map(p => ({ id: p.id, name: p.name, color: p.color }))} 
+      pillars={pillars.map(p => ({ id: p.id, name: p.name, color: p.color, iconUrl: p.iconUrl }))} 
     />
   );
 }

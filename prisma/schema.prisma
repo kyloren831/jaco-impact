@@ -249,6 +249,7 @@ model Project {
   createdBY   Int // id del usuario que creo el proyecto
   name        String          @db.VarChar(150)
   description String          @db.Text
+  photoUrl    String?         @db.VarChar(255)
   objectives  String?         @db.Text
   status      ProjectStatus
   visibility  Visibility

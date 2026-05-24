@@ -3,6 +3,7 @@ import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 // ── Types ──────────────────────────────────────────────────────────
 export interface AccessTokenPayload extends JWTPayload {
   sub: string;       // userId como string (JWT spec)
+  userId: number;    // userId como numero
   email: string;
   role: string;      // rol principal
   roles: string[];   // todos los roles
@@ -32,6 +33,7 @@ export async function signAccessToken(payload: {
   roles: string[];
 }): Promise<string> {
   return new SignJWT({
+    userId: payload.sub,
     email: payload.email,
     role: payload.role,
     roles: payload.roles,

@@ -9,8 +9,8 @@ const navItems = [
   { name: "Usuarios", href: "/dashboard/admin/users", icon: UsersIcon },
   { name: "Pilares", href: "/dashboard/admin/pillars", icon: LayersIcon },
   { name: "Voluntarios", href: "/dashboard/admin/volunteers", icon: HeartIcon },
-  { name: "Proyectos y Eventos", href: "/dashboard/admin/projects", icon: CalendarIcon },
-  { name: "Tareas y Evidencias", href: "/dashboard/admin/tasks", icon: CheckCircleIcon },
+  { name: "Proyectos", href: "/dashboard/admin/projects", icon: CalendarIcon },
+  { name: "Eventos y Tareas", href: "/dashboard/admin/events", icon: CheckCircleIcon },
   { name: "Noticias", href: "/dashboard/admin/news", icon: NewspaperIcon },
   { name: "Pymes y Productos", href: "/dashboard/admin/pymes", icon: StoreIcon },
 ];
@@ -56,8 +56,8 @@ export default function AdminSidebar() {
                   onClick={() => setIsMobileOpen(false)}
                   className={`
                     flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200
-                    ${isActive 
-                      ? "bg-brand-verde/10 text-brand-verde" 
+                    ${isActive
+                      ? "bg-brand-verde/10 text-brand-verde"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     }
                   `}
@@ -73,7 +73,7 @@ export default function AdminSidebar() {
 
       {/* Overlay for mobile */}
       {isMobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 z-20 md:hidden"
           onClick={() => setIsMobileOpen(false)}
         />

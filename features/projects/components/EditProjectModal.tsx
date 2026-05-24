@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { updateProject } from "../actions";
-import Modal from "@/components/ui/Modal";
+import FormModal from "@/components/ui/FormModal";
 
 interface EditProjectModalProps {
   project: any;
@@ -41,7 +41,7 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
   };
 
   return (
-    <Modal
+    <FormModal
       onClose={onClose}
       title="Editar Proyecto"
       description={`Modificando información de ${project.name}`}
@@ -56,141 +56,129 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
           ✏️
         </div>
       }
+      onSubmit={handleSubmit}
+      loading={loading}
+      error={error}
+      submitLabel="Guardar Cambios"
     >
-      <form onSubmit={handleSubmit} className="p-8 space-y-6">
-        {error && (
-          <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-body font-medium border border-red-100 flex items-center gap-3">
-            <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            {error}
+      <div>
+        <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+          Nombre del Proyecto
+        </label>
+        <input
+          required
+          name="name"
+          type="text"
+          defaultValue={project.name}
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
+        />
+      </div>
+
+      <div>
+        <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+          Descripción
+        </label>
+        <textarea
+          required
+          name="description"
+          rows={3}
+          defaultValue={project.description}
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white resize-none"
+        />
+      </div>
+
+      <div>
+        <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+          Objetivos
+        </label>
+        <textarea
+          name="objectives"
+          rows={3}
+          defaultValue={project.objectives || ""}
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white resize-none"
+        />
+      </div>
+
+      <div>
+        <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+          Foto del Proyecto
+        </label>
+        {project.photoUrl && (
+          <div className="mb-2 flex items-center gap-3 p-2 bg-gray-50 rounded-xl border border-gray-100">
+            <img
+              src={project.photoUrl}
+              alt="Foto actual"
+              className="w-14 h-14 rounded-lg object-cover border border-gray-200"
+            />
+            <span className="font-body text-xs text-gray-500">Foto actual — selecciona una nueva para reemplazarla</span>
           </div>
         )}
+        <input
+          type="file"
+          name="photoUrl"
+          accept="image/*"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 file:cursor-pointer file:transition-colors"
+        />
+      </div>
 
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Nombre del Proyecto
+            Estado
+          </label>
+          <select
+            required
+            name="status"
+            defaultValue={project.status}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white appearance-none"
+          >
+            <option value="DRAFT">Borrador</option>
+            <option value="PUBLISHED">Publicado</option>
+            <option value="IN_PROGRESS">En Progreso</option>
+            <option value="COMPLETED">Completado</option>
+            <option value="CANCELLED">Cancelado</option>
+          </select>
+        </div>
+        <div>
+          <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+            Visibilidad
+          </label>
+          <select
+            required
+            name="visibility"
+            defaultValue={project.visibility}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white appearance-none"
+          >
+            <option value="PUBLIC">Público</option>
+            <option value="PRIVATE">Privado</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+            Fecha de Inicio
           </label>
           <input
-            required
-            name="name"
-            type="text"
-            defaultValue={project.name}
+            type="date"
+            name="startDate"
+            defaultValue={formatForInput(project.startDate)}
             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
           />
         </div>
-
         <div>
           <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Descripción
+            Fecha de Finalización
           </label>
-          <textarea
-            required
-            name="description"
-            rows={3}
-            defaultValue={project.description}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white resize-none"
+          <input
+            type="date"
+            name="endDate"
+            defaultValue={formatForInput(project.endDate)}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
           />
         </div>
-
-        <div>
-          <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Objetivos
-          </label>
-          <textarea
-            name="objectives"
-            rows={3}
-            defaultValue={project.objectives || ""}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white resize-none"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-              Estado
-            </label>
-            <select
-              required
-              name="status"
-              defaultValue={project.status}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white appearance-none"
-            >
-              <option value="DRAFT">Borrador</option>
-              <option value="PUBLISHED">Publicado</option>
-              <option value="IN_PROGRESS">En Progreso</option>
-              <option value="COMPLETED">Completado</option>
-              <option value="CANCELLED">Cancelado</option>
-            </select>
-          </div>
-          <div>
-            <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-              Visibilidad
-            </label>
-            <select
-              required
-              name="visibility"
-              defaultValue={project.visibility}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white appearance-none"
-            >
-              <option value="PUBLIC">Público</option>
-              <option value="PRIVATE">Privado</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-              Fecha de Inicio
-            </label>
-            <input
-              type="date"
-              name="startDate"
-              defaultValue={formatForInput(project.startDate)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
-            />
-          </div>
-          <div>
-            <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-              Fecha de Finalización
-            </label>
-            <input
-              type="date"
-              name="endDate"
-              defaultValue={formatForInput(project.endDate)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
-            />
-          </div>
-        </div>
-
-        <div className="pt-6 border-t border-gray-100 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-6 py-3 rounded-xl font-body font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-3 rounded-xl font-body font-bold text-white bg-black hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Guardando...
-              </>
-            ) : (
-              "Guardar Cambios"
-            )}
-          </button>
-        </div>
-      </form>
-    </Modal>
+      </div>
+    </FormModal>
   );
 }

@@ -14,6 +14,7 @@ export type ProjectResponse = {
   startDate: Date | null;
   endDate: Date | null;
   publishedAt: Date | null;
+  photoUrl: string | null;
   createdAt: Date;
 };
 
@@ -38,6 +39,7 @@ export class ProjectMapper {
       startDate: dto.startDate ?? null,
       endDate: dto.endDate ?? null,
       publishedAt: null,
+      photoUrl: null,
     };
   }
 
@@ -57,6 +59,7 @@ export class ProjectMapper {
       startDate: project.startDate,
       endDate: project.endDate,
       publishedAt: project.publishedAt,
+      photoUrl: project.photoUrl,
       createdAt: project.createdAt,
     };
   }

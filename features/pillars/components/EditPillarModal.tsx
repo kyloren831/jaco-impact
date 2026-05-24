@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { updatePillar } from "../actions";
 
-import Modal from "@/components/ui/Modal";
+import FormModal from "@/components/ui/FormModal";
 
 interface Props {
   pillar: any;
@@ -21,7 +21,7 @@ export default function EditPillarModal({ pillar, coordinators, onClose, onSucce
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!coordinatorId) {
       setError("Debes seleccionar un coordinador.");
@@ -51,7 +51,7 @@ export default function EditPillarModal({ pillar, coordinators, onClose, onSucce
   };
 
   return (
-    <Modal
+    <FormModal
       onClose={onClose}
       title="Editar Pilar"
       description={`Modificando ${pillar.name}`}
@@ -64,117 +64,95 @@ export default function EditPillarModal({ pillar, coordinators, onClose, onSucce
           )}
         </div>
       }
+      onSubmit={handleSubmit}
+      loading={loading}
+      error={error}
+      submitLabel="Guardar Cambios"
+      submitColor={color}
     >
-      <form onSubmit={handleSubmit} className="p-8 space-y-5">
-        {error && (
-          <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm font-semibold">
-            {error}
-          </div>
-        )}
+      <div>
+        <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+          Nombre del Pilar
+        </label>
+        <input
+          required
+          type="text"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white placeholder:text-gray-400"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
 
+      <div>
+        <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+          Descripción Corta
+        </label>
+        <textarea
+          required
+          rows={3}
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium resize-none text-gray-900 bg-white placeholder:text-gray-400"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Nombre del Pilar
+            Nueva Imagen (Opcional)
           </label>
-          <input
-            required
-            type="text"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white placeholder:text-gray-400"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Descripción Corta
-          </label>
-          <textarea
-            required
-            rows={3}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium resize-none text-gray-900 bg-white placeholder:text-gray-400"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div>
-            <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-              Nueva Imagen (Opcional)
-            </label>
-            <div className="relative w-full h-12 rounded-xl border-2 border-dashed border-gray-200 hover:border-black transition-colors flex items-center justify-center overflow-hidden bg-gray-50 cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                onChange={(e) => setIcon(e.target.files?.[0] || null)}
-              />
-              <span className="font-body text-sm font-semibold text-gray-500 truncate px-4 pointer-events-none">
-                {icon ? icon.name : "Cambiar imagen..."}
-              </span>
-            </div>
-          </div>
-          
-          <div>
-            <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-              Color Representativo
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                required
-                type="color"
-                className="w-12 h-12 rounded-xl cursor-pointer border-0 p-0"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-              />
-              <input
-                required
-                type="text"
-                className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium uppercase text-gray-900 bg-white placeholder:text-gray-400"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-              />
-            </div>
+          <div className="relative w-full h-12 rounded-xl border-2 border-dashed border-gray-200 hover:border-black transition-colors flex items-center justify-center overflow-hidden bg-gray-50 cursor-pointer">
+            <input
+              type="file"
+              accept="image/*"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              onChange={(e) => setIcon(e.target.files?.[0] || null)}
+            />
+            <span className="font-body text-sm font-semibold text-gray-500 truncate px-4 pointer-events-none">
+              {icon ? icon.name : "Cambiar imagen..."}
+            </span>
           </div>
         </div>
-
+        
         <div>
           <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-            Coordinador
+            Color Representativo
           </label>
-          <select
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-semibold text-gray-900 bg-white"
-            value={coordinatorId}
-            onChange={(e) => setCoordinatorId(Number(e.target.value))}
-            required
-          >
-            <option value="" disabled>Selecciona un coordinador</option>
-            {coordinators.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-3">
+            <input
+              required
+              type="color"
+              className="w-12 h-12 rounded-xl cursor-pointer border-0 p-0"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+            />
+            <input
+              required
+              type="text"
+              className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium uppercase text-gray-900 bg-white placeholder:text-gray-400"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+            />
+          </div>
         </div>
+      </div>
 
-        <div className="pt-4 border-t border-gray-100 flex justify-end gap-4 mt-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-6 py-2.5 rounded-full font-body font-semibold text-gray-600 hover:bg-gray-200 transition-colors"
-            disabled={loading}
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-2.5 rounded-full font-body font-bold text-white hover:bg-gray-800 transition-colors shadow-lg disabled:opacity-50 flex items-center gap-2"
-            style={{ backgroundColor: color }}
-          >
-            {loading ? "Guardando..." : "Guardar Cambios"}
-          </button>
-        </div>
-      </form>
-    </Modal>
+      <div>
+        <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+          Coordinador
+        </label>
+        <select
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-semibold text-gray-900 bg-white"
+          value={coordinatorId}
+          onChange={(e) => setCoordinatorId(Number(e.target.value))}
+          required
+        >
+          <option value="" disabled>Selecciona un coordinador</option>
+          {coordinators.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
+      </div>
+    </FormModal>
   );
 }

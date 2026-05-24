@@ -83,4 +83,24 @@ export class VolunteerService {
       volunteer: result.volunteer,
     };
   }
+
+  async getAllVolunteers() {
+    return prisma.volunteer.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            imageUrl: true,
+          },
+        },
+      },
+      orderBy: {
+        user: {
+          name: "asc",
+        },
+      },
+    });
+  }
 }

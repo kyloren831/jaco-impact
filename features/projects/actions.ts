@@ -3,6 +3,7 @@
 import { requireAuth } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { uploadFileToR2 } from "@/lib/storage/r2";
 
 export async function createProject(formData: FormData) {
   const session = await requireAuth();
@@ -45,6 +46,13 @@ export async function createProject(formData: FormData) {
       publishedAt = new Date();
     }
 
+    // Upload photo to R2 if provided
+    let photoUrl: string | null = null;
+    const photoFile = formData.get("photoUrl") as File | null;
+    if (photoFile && photoFile.size > 0) {
+      photoUrl = await uploadFileToR2(photoFile, "projects");
+    }
+
     await prisma.project.create({
       data: {
         createdBY: session.userId,
@@ -56,7 +64,8 @@ export async function createProject(formData: FormData) {
         visibility,
         startDate,
         endDate,
-        publishedAt
+        publishedAt,
+        photoUrl,
       },
     });
 
@@ -93,6 +102,14 @@ export async function getProjects() {
   });
 
   return projects;
+}
+
+export async function getProjectById(id: number) {
+  const project = await prisma.project.findUnique({
+    where: { id },
+    select: { id: true, name: true, description: true, status: true },
+  });
+  return project;
 }
 
 export async function updateProject(id: number, formData: FormData) {
@@ -145,6 +162,12 @@ export async function updateProject(id: number, formData: FormData) {
       dataToUpdate.endDate = new Date(endDateStr);
     } else if (endDateStr === "") {
       dataToUpdate.endDate = null;
+    }
+
+    // Upload new photo to R2 if provided
+    const photoFile = formData.get("photoUrl") as File | null;
+    if (photoFile && photoFile.size > 0) {
+      dataToUpdate.photoUrl = await uploadFileToR2(photoFile, "projects");
     }
 
     await prisma.project.update({

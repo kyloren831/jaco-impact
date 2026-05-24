@@ -1,56 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./login.module.css";
+import { loginAction } from "@/features/auth/actions";
+
+// We'll wrap the server action slightly because useActionState expects `(state, payload)`
+const loginActionWrapper = async (prevState: any, formData: FormData) => {
+  return await loginAction(prevState, formData);
+};
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Error al iniciar sesión");
-      } else {
-        // Redirigir según el rol
-        if (data.role === "ADMIN") {
-          router.push("/dashboard/admin");
-        } else if (data.role === "PYME_MANAGER") {
-          router.push("/dashboard"); // Futuro dashboard de pymes
-        } else if (data.role === "COORDINATOR") {
-          router.push("/dashboard"); // Futuro dashboard de coordinador
-        } else {
-          router.push("/dashboard"); // VOLUNTEER u otros
-        }
-        
-        router.refresh();
-      }
-    } catch (err) {
-      setError("Error de conexión, inténtalo de nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [state, formAction, isPending] = useActionState(loginActionWrapper, null);
 
   return (
     <div className={styles.loginPage}>
@@ -75,24 +37,19 @@ export default function LoginPage() {
       {/* Card with Leaves */}
       <div className={styles.cardContainer}>
         {/* Decorative Leaves */}
-        {/* Top-left cluster */}
         <img src="/leaf-1.svg" alt="" className={`${styles.leaf} ${styles.leafTopLeft1}`} aria-hidden="true" />
         <img src="/leaf-2.svg" alt="" className={`${styles.leaf} ${styles.leafTopLeft2}`} aria-hidden="true" />
         <img src="/leaf-3.svg" alt="" className={`${styles.leaf} ${styles.leafTopLeft3}`} aria-hidden="true" />
 
-        {/* Top-right cluster */}
         <img src="/leaf-2.svg" alt="" className={`${styles.leaf} ${styles.leafTopRight1}`} aria-hidden="true" />
         <img src="/leaf-1.svg" alt="" className={`${styles.leaf} ${styles.leafTopRight2}`} aria-hidden="true" />
 
-        {/* Bottom-left cluster */}
         <img src="/leaf-3.svg" alt="" className={`${styles.leaf} ${styles.leafBottomLeft1}`} aria-hidden="true" />
         <img src="/leaf-1.svg" alt="" className={`${styles.leaf} ${styles.leafBottomLeft2}`} aria-hidden="true" />
 
-        {/* Bottom-right cluster */}
         <img src="/leaf-2.svg" alt="" className={`${styles.leaf} ${styles.leafBottomRight1}`} aria-hidden="true" />
         <img src="/leaf-3.svg" alt="" className={`${styles.leaf} ${styles.leafBottomRight2}`} aria-hidden="true" />
 
-        {/* Middle sides */}
         <img src="/leaf-1.svg" alt="" className={`${styles.leaf} ${styles.leafMidLeft}`} aria-hidden="true" />
         <img src="/leaf-3.svg" alt="" className={`${styles.leaf} ${styles.leafMidRight}`} aria-hidden="true" />
 
@@ -137,7 +94,7 @@ export default function LoginPage() {
             </div>
 
             {/* Error message */}
-            {error && (
+            {state?.error && (
               <div className={styles.errorBox}>
                 <svg className={styles.errorIcon} viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -146,12 +103,12 @@ export default function LoginPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <p className={styles.errorText}>{error}</p>
+                <p className={styles.errorText}>{state.error}</p>
               </div>
             )}
 
-            {/* Form */}
-            <form onSubmit={handleSubmit}>
+            {/* Form using Server Action */}
+            <form action={formAction}>
               <div className={styles.fieldGroup}>
                 <div className={styles.labelRow}>
                   <label htmlFor="email" className={styles.label}>Correo Electrónico</label>
@@ -162,8 +119,6 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   className={styles.input}
                   placeholder="tu@correo.com"
                 />
@@ -182,8 +137,6 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   className={styles.input}
                   placeholder="••••••••"
                 />
@@ -191,10 +144,10 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isPending}
                 className={styles.submitBtn}
               >
-                {loading ? (
+                {isPending ? (
                   <span className={styles.spinner}>
                     <svg className={styles.spinnerIcon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
