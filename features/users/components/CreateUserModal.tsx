@@ -52,7 +52,7 @@ export default function CreateUserModal({ onClose, onSuccess }: Props) {
         <input
           required
           type="text"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white placeholder:text-gray-400"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder-gray-500"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Ej. Juan Pérez"
@@ -66,7 +66,7 @@ export default function CreateUserModal({ onClose, onSuccess }: Props) {
         <input
           required
           type="email"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white placeholder:text-gray-400"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder-gray-500"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="juan@ejemplo.com"
@@ -80,7 +80,7 @@ export default function CreateUserModal({ onClose, onSuccess }: Props) {
         <input
           required
           type="password"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white placeholder:text-gray-400"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder-gray-500"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
@@ -92,7 +92,7 @@ export default function CreateUserModal({ onClose, onSuccess }: Props) {
           Rol Principal
         </label>
         <select
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-semibold text-gray-900 bg-white"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-800"
           value={role}
           onChange={(e) => setRole(e.target.value)}
         >

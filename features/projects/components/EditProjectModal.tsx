@@ -70,7 +70,7 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
           name="name"
           type="text"
           defaultValue={project.name}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800"
         />
       </div>
 
@@ -83,7 +83,7 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
           name="description"
           rows={3}
           defaultValue={project.description}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white resize-none"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 resize-none"
         />
       </div>
 
@@ -95,7 +95,7 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
           name="objectives"
           rows={3}
           defaultValue={project.objectives || ""}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white resize-none"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 resize-none"
         />
       </div>
 
@@ -104,20 +104,20 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
           Foto del Proyecto
         </label>
         {project.photoUrl && (
-          <div className="mb-2 flex items-center gap-3 p-2 bg-gray-50 rounded-xl border border-gray-100">
+          <div className="mb-2 flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
             <img
               src={project.photoUrl}
               alt="Foto actual"
-              className="w-14 h-14 rounded-lg object-cover border border-gray-200"
+              className="w-14 h-14 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
             />
-            <span className="font-body text-xs text-gray-500">Foto actual — selecciona una nueva para reemplazarla</span>
+            <span className="font-body text-xs text-gray-500 dark:text-gray-400">Foto actual — selecciona una nueva para reemplazarla</span>
           </div>
         )}
         <input
           type="file"
           name="photoUrl"
           accept="image/*"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 file:cursor-pointer file:transition-colors"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-200 hover:file:bg-gray-200 dark:hover:file:bg-gray-600 file:cursor-pointer file:transition-colors"
         />
       </div>
 
@@ -130,7 +130,7 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
             required
             name="status"
             defaultValue={project.status}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white appearance-none"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 appearance-none"
           >
             <option value="DRAFT">Borrador</option>
             <option value="PUBLISHED">Publicado</option>
@@ -147,7 +147,7 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
             required
             name="visibility"
             defaultValue={project.visibility}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white appearance-none"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 appearance-none"
           >
             <option value="PUBLIC">Público</option>
             <option value="PRIVATE">Privado</option>
@@ -164,7 +164,7 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
             type="date"
             name="startDate"
             defaultValue={formatForInput(project.startDate)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800"
           />
         </div>
         <div>
@@ -175,7 +175,7 @@ export function EditProjectModal({ project, pillars, onClose, onSuccess }: EditP
             type="date"
             name="endDate"
             defaultValue={formatForInput(project.endDate)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800"
           />
         </div>
       </div>

@@ -53,7 +53,7 @@ export function CreateProjectModal({ onClose, onSuccess, pillars }: CreateProjec
           required
           name="name"
           type="text"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white placeholder:text-gray-400"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder-gray-500"
           placeholder="Ej. Reforestación Playa Hermosa"
         />
       </div>
@@ -65,7 +65,7 @@ export function CreateProjectModal({ onClose, onSuccess, pillars }: CreateProjec
         <select
           required
           name="pillarId"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white appearance-none"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 appearance-none"
         >
           <option value="">Selecciona un pilar...</option>
           {pillars.map((p) => (
@@ -84,7 +84,7 @@ export function CreateProjectModal({ onClose, onSuccess, pillars }: CreateProjec
           required
           name="description"
           rows={3}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white placeholder:text-gray-400 resize-none"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder-gray-500 resize-none"
           placeholder="Describe el propósito general del proyecto..."
         />
       </div>
@@ -96,7 +96,7 @@ export function CreateProjectModal({ onClose, onSuccess, pillars }: CreateProjec
         <textarea
           name="objectives"
           rows={3}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white placeholder:text-gray-400 resize-none"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder-gray-500 resize-none"
           placeholder="Detalla los objetivos específicos..."
         />
       </div>
@@ -109,7 +109,7 @@ export function CreateProjectModal({ onClose, onSuccess, pillars }: CreateProjec
           type="file"
           name="photoUrl"
           accept="image/*"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 file:cursor-pointer file:transition-colors"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-200 hover:file:bg-gray-200 dark:hover:file:bg-gray-600 file:cursor-pointer file:transition-colors"
         />
       </div>
 
@@ -121,7 +121,7 @@ export function CreateProjectModal({ onClose, onSuccess, pillars }: CreateProjec
           <select
             required
             name="status"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white appearance-none"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 appearance-none"
             defaultValue="DRAFT"
           >
             <option value="DRAFT">Borrador</option>
@@ -136,7 +136,7 @@ export function CreateProjectModal({ onClose, onSuccess, pillars }: CreateProjec
           <select
             required
             name="visibility"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white appearance-none"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 appearance-none"
             defaultValue="PUBLIC"
           >
             <option value="PUBLIC">Público</option>
@@ -153,7 +153,7 @@ export function CreateProjectModal({ onClose, onSuccess, pillars }: CreateProjec
           <input
             type="date"
             name="startDate"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800"
           />
         </div>
         <div>
@@ -163,7 +163,7 @@ export function CreateProjectModal({ onClose, onSuccess, pillars }: CreateProjec
           <input
             type="date"
             name="endDate"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-verde focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800"
           />
         </div>
       </div>

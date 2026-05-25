@@ -58,8 +58,8 @@ export default function EditRolesModal({ user, onClose, onSuccess }: Props) {
             key={role}
             className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
               selectedRoles.includes(role)
-                ? "border-black bg-black/5"
-                : "border-gray-100 hover:border-gray-200"
+                ? "border-black dark:border-white bg-black/5 dark:bg-white/10"
+                : "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700"
             }`}
           >
             <div className="relative flex items-center justify-center">
@@ -71,17 +71,17 @@ export default function EditRolesModal({ user, onClose, onSuccess }: Props) {
               />
               <div
                 className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${
-                  selectedRoles.includes(role) ? "bg-black" : "bg-gray-200"
+                  selectedRoles.includes(role) ? "bg-black dark:bg-white" : "bg-gray-200 dark:bg-gray-700"
                 }`}
               >
                 {selectedRoles.includes(role) && (
-                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <svg className="w-4 h-4 text-white dark:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
               </div>
             </div>
-            <span className="font-body font-semibold text-gray-800">{role}</span>
+            <span className="font-body font-semibold text-gray-800 dark:text-gray-200">{role}</span>
           </label>
         ))}
       </div>

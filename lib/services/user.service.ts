@@ -119,4 +119,28 @@ export class UserService {
     const { password: _, ...userWithoutPassword } = updated;
     return userWithoutPassword;
   }
+
+  /**
+   * Obtiene la información del usuario actual.
+   */
+  async getCurrentUser(userId: number) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        imageUrl: true,
+        userRoles: {
+          select: { role: true },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    return user;
+  }
 }

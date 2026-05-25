@@ -61,11 +61,11 @@ export function CreateEventModal({ projectId, status, onClose, onSuccess }: Crea
       <div className="grid grid-cols-1 gap-5">
         {!projectId && (
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">Proyecto *</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Proyecto *</label>
             <select
               name="projectId"
               required
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all font-body text-sm text-gray-900"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-verde/50 focus:border-brand-verde transition-all font-body text-sm text-gray-900 dark:text-gray-100"
             >
               <option value="">Selecciona un proyecto...</option>
               {projects.map((p) => (
@@ -78,21 +78,21 @@ export function CreateEventModal({ projectId, status, onClose, onSuccess }: Crea
         )}
 
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Nombre del Evento *</label>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Nombre del Evento *</label>
           <input
             name="name"
             required
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all font-body text-sm text-gray-900"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-verde/50 focus:border-brand-verde transition-all font-body text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             placeholder="Ej. Jornada de Limpieza"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Descripción</label>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Descripción</label>
           <textarea
             name="description"
             rows={3}
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all resize-none font-body text-sm text-gray-900"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-verde/50 focus:border-brand-verde transition-all resize-none font-body text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             placeholder="Detalles sobre el evento (opcional)..."
           ></textarea>
         </div>
@@ -100,19 +100,19 @@ export function CreateEventModal({ projectId, status, onClose, onSuccess }: Crea
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Fecha Principal *</label>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Fecha Principal *</label>
           <input
             type="datetime-local"
             name="eventDate"
             required
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all font-body text-sm text-gray-900"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-verde/50 focus:border-brand-verde transition-all font-body text-sm text-gray-900 dark:text-gray-100"
           />
         </div>
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Ubicación</label>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Ubicación</label>
           <input
             name="location"
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all font-body text-sm text-gray-900"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-verde/50 focus:border-brand-verde transition-all font-body text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             placeholder="Lugar del evento"
           />
         </div>
@@ -120,21 +120,21 @@ export function CreateEventModal({ projectId, status, onClose, onSuccess }: Crea
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Voluntarios Necesarios</label>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Voluntarios Necesarios</label>
           <input
             type="number"
             name="volunteersNeeded"
             min="0"
             defaultValue="0"
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all font-body text-sm text-gray-900"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-verde/50 focus:border-brand-verde transition-all font-body text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             placeholder="0 para sin límite"
           />
         </div>
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Visibilidad</label>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Visibilidad</label>
           <select
             name="visibility"
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all font-body text-sm text-gray-900"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-verde/50 focus:border-brand-verde transition-all font-body text-sm text-gray-900 dark:text-gray-100"
           >
             <option value="PUBLIC">Público</option>
             <option value="PRIVATE">Privado</option>
@@ -144,19 +144,19 @@ export function CreateEventModal({ projectId, status, onClose, onSuccess }: Crea
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Fecha Inicio (Opcional)</label>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Fecha Inicio (Opcional)</label>
           <input
             type="datetime-local"
             name="startDate"
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all font-body text-sm text-gray-900"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-verde/50 focus:border-brand-verde transition-all font-body text-sm text-gray-900 dark:text-gray-100"
           />
         </div>
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1.5">Fecha Fin (Opcional)</label>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Fecha Fin (Opcional)</label>
           <input
             type="datetime-local"
             name="endDate"
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all font-body text-sm text-gray-900"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-verde/50 focus:border-brand-verde transition-all font-body text-sm text-gray-900 dark:text-gray-100"
           />
         </div>
       </div>

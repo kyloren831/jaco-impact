@@ -69,7 +69,7 @@ export default function CreatePillarModal({ coordinators, onClose, onSuccess }: 
         <input
           required
           type="text"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium text-gray-900 bg-white placeholder:text-gray-400"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-all font-body font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder-gray-500"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Ej. Deporte y Salud"
@@ -83,7 +83,7 @@ export default function CreatePillarModal({ coordinators, onClose, onSuccess }: 
         <textarea
           required
           rows={3}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium resize-none text-gray-900 bg-white placeholder:text-gray-400"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-all font-body font-medium resize-none text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder-gray-500"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Describe el propósito del pilar..."
@@ -95,7 +95,7 @@ export default function CreatePillarModal({ coordinators, onClose, onSuccess }: 
           <label className="block font-body text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
             Imagen del Pilar
           </label>
-          <div className="relative w-full h-12 rounded-xl border-2 border-dashed border-gray-200 hover:border-black transition-colors flex items-center justify-center overflow-hidden bg-gray-50 cursor-pointer">
+          <div className="relative w-full h-12 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-black dark:hover:border-white transition-colors flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-800 cursor-pointer">
             <input
               required
               type="file"
@@ -103,7 +103,7 @@ export default function CreatePillarModal({ coordinators, onClose, onSuccess }: 
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               onChange={(e) => setIcon(e.target.files?.[0] || null)}
             />
-            <span className="font-body text-sm font-semibold text-gray-500 truncate px-4 pointer-events-none">
+            <span className="font-body text-sm font-semibold text-gray-500 dark:text-gray-400 truncate px-4 pointer-events-none">
               {icon ? icon.name : "Seleccionar imagen"}
             </span>
           </div>
@@ -124,7 +124,7 @@ export default function CreatePillarModal({ coordinators, onClose, onSuccess }: 
             <input
               required
               type="text"
-              className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-medium uppercase text-gray-900 bg-white placeholder:text-gray-400"
+              className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-all font-body font-medium uppercase text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder-gray-500"
               value={color}
               onChange={(e) => setColor(e.target.value)}
             />
@@ -137,7 +137,7 @@ export default function CreatePillarModal({ coordinators, onClose, onSuccess }: 
           Coordinador
         </label>
         <select
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all font-body font-semibold text-gray-900 bg-white"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-all font-body font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-800"
           value={coordinatorId}
           onChange={(e) => setCoordinatorId(Number(e.target.value))}
           required

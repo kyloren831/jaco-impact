@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -22,8 +23,10 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="md:hidden p-4 border-b bg-white flex justify-between items-center fixed top-20 left-0 right-0 z-40 shadow-sm">
-        <span className="font-semibold text-gray-700">Menú Administrativo</span>
+      <div className="md:hidden p-4 border-b bg-white flex justify-between items-center fixed top-0 left-0 right-0 z-40 shadow-sm h-16">
+        <Link href="/">
+          <Image src="/letters-logo.png" alt="Jaco Impact" width={120} height={34} className="h-8 w-auto brightness-0" priority />
+        </Link>
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           className="p-2 bg-gray-100 rounded-md text-gray-600 focus:outline-none"
@@ -35,15 +38,17 @@ export default function AdminSidebar() {
       {/* Sidebar Container */}
       <aside
         className={`
-          fixed md:sticky top-[72px] left-0 z-30 h-[calc(100vh-72px)] w-64 bg-white border-r border-gray-200 overflow-y-auto
-          transition-transform duration-300 ease-in-out
+          fixed md:sticky top-0 left-0 z-30 h-screen w-64 bg-white border-r border-gray-200 overflow-y-auto
+          transition-transform duration-300 ease-in-out pt-16 md:pt-0
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >
         <div className="p-6">
-          <h2 className="text-xs font-black text-gray-400 uppercase tracking-wider mb-6">
-            Administración
-          </h2>
+          <div className="mb-8 hidden md:block">
+            <Link href="/">
+              <Image src="/letters-logo.png" alt="Jaco Impact" width={160} height={46} className="h-10 w-auto brightness-0" priority />
+            </Link>
+          </div>
           <nav className="space-y-1.5">
             {navItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);

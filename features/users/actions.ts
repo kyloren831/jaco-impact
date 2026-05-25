@@ -1,8 +1,9 @@
 "use server";
 
-import { requireRole } from "@/lib/auth/guards";
+import { requireRole, requireAuth } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { UserService } from "@/lib/services/user.service";
 
 export async function getUsers() {
   await requireRole("ADMIN");
@@ -103,5 +104,16 @@ export async function createUser(data: { name: string; email: string; password?:
   } catch (error) {
     console.error("Error creating user:", error);
     return { success: false, error: "No se pudo crear el usuario." };
+  }
+}
+
+export async function getCurrentUserAction() {
+  try {
+    const session = await requireAuth();
+    const userService = new UserService();
+    const user = await userService.getCurrentUser(session.userId);
+    return { success: true as const, data: user };
+  } catch (error) {
+    return { success: false as const, error: "No autenticado" };
   }
 }
