@@ -55,28 +55,28 @@ export default function UsersClientView({ initialUsers }: { initialUsers: User[]
       />
 
       {/* Glassmorphism Table Container */}
-      <div className="bg-white/80 backdrop-blur-xl border border-white rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] overflow-hidden">
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white dark:border-gray-700 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/50">
+              <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
                 <th className="font-body text-xs font-bold uppercase tracking-widest text-gray-400 px-6 py-5">Usuario</th>
                 <th className="font-body text-xs font-bold uppercase tracking-widest text-gray-400 px-6 py-5">Roles</th>
                 <th className="font-body text-xs font-bold uppercase tracking-widest text-gray-400 px-6 py-5">Estado</th>
                 <th className="font-body text-xs font-bold uppercase tracking-widest text-gray-400 px-6 py-5 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
               {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-white/50 transition-colors">
+                <tr key={user.id} className="hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-headline font-bold text-black border border-gray-200">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center font-headline font-bold text-black dark:text-white border border-gray-200 dark:border-gray-600">
                         {user.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-body font-bold text-gray-900">{user.name}</p>
-                        <p className="font-body text-xs font-medium text-gray-500">{user.email}</p>
+                        <p className="font-body font-bold text-gray-900 dark:text-white">{user.name}</p>
+                        <p className="font-body text-xs font-medium text-gray-500 dark:text-gray-400">{user.email}</p>
                       </div>
                     </div>
                   </td>
@@ -94,7 +94,7 @@ export default function UsersClientView({ initialUsers }: { initialUsers: User[]
                           </span>
                         ))
                       ) : (
-                        <span className="font-body text-[10px] font-bold px-2.5 py-1 rounded-md bg-gray-200 text-gray-600">SIN ROL</span>
+                        <span className="font-body text-[10px] font-bold px-2.5 py-1 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">SIN ROL</span>
                       )}
                     </div>
                   </td>
@@ -104,8 +104,8 @@ export default function UsersClientView({ initialUsers }: { initialUsers: User[]
                       onClick={() => toggleStatus(user)}
                       className={`font-body text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 ${
                         user.isActive 
-                          ? "bg-green-50 text-[#45B85A] hover:bg-green-100" 
-                          : "bg-red-50 text-[#ED242E] hover:bg-red-100"
+                          ? "bg-green-50 dark:bg-green-900/30 text-[#45B85A] hover:bg-green-100 dark:hover:bg-green-900/50" 
+                          : "bg-red-50 dark:bg-red-900/30 text-[#ED242E] hover:bg-red-100 dark:hover:bg-red-900/50"
                       }`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${user.isActive ? "bg-[#45B85A]" : "bg-[#ED242E]"}`}></span>
@@ -116,7 +116,7 @@ export default function UsersClientView({ initialUsers }: { initialUsers: User[]
                   <td className="px-6 py-5 text-right">
                     <button
                       onClick={() => setEditingUser(user)}
-                      className="font-body text-sm font-bold text-gray-600 hover:text-black bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-xl transition-all shadow-sm border border-gray-100"
+                      className="font-body text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-xl transition-all shadow-sm border border-gray-100 dark:border-gray-700"
                     >
                       Editar Roles
                     </button>

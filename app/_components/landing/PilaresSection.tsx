@@ -10,23 +10,23 @@ type PublicPillar = {
 
 export default function PilaresSection({ pilares }: { pilares: PublicPillar[] }) {
   return (
-    <section id="pilares" className="py-24 bg-white">
+    <section id="pilares" className="py-24 bg-white dark:bg-gray-900">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="text-center mb-16 animate-[fadeInUp_1s_ease-out_forwards]">
           <div className="inline-block px-4 py-2 bg-brand-turquesa/15 text-brand-turquesa rounded-full font-bold text-sm tracking-wider uppercase mb-6">
             Nuestros Pilares
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-black mb-6 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-black text-black dark:text-white mb-6 tracking-tight">
             Nuestras áreas de <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-verde to-brand-turquesa">Acción</span>
           </h2>
-          <p className="text-black/60 text-lg max-w-2xl mx-auto">Intervenimos en distintas áreas para lograr un bienestar integral para todas las personas del cantón.</p>
+          <p className="text-black/60 dark:text-gray-400 text-lg max-w-2xl mx-auto">Intervenimos en distintas áreas para lograr un bienestar integral para todas las personas del cantón.</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {pilares.map((pilar, i) => (
             <div 
               key={pilar.id} 
-              className="bg-white border rounded-2xl p-8 relative overflow-hidden transition-all duration-300 hover:-translate-y-2 group shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] border-neutral-100 flex flex-col"
+              className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-2xl p-8 relative overflow-hidden transition-all duration-300 hover:-translate-y-2 group shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] border-neutral-100 flex flex-col"
               style={{
                 animationDelay: `${i * 100}ms`
               }}
@@ -47,8 +47,8 @@ export default function PilaresSection({ pilares }: { pilares: PublicPillar[] })
                 )}
               </div>
               
-              <h3 className="text-2xl font-bold text-black mb-4 relative z-10">{pilar.name}</h3>
-              <p className="text-black/70 leading-relaxed relative z-10 flex-1">{pilar.description}</p>
+              <h3 className="text-2xl font-bold text-black dark:text-white mb-4 relative z-10">{pilar.name}</h3>
+              <p className="text-black/70 dark:text-gray-400 leading-relaxed relative z-10 flex-1">{pilar.description}</p>
             </div>
           ))}
         </div>

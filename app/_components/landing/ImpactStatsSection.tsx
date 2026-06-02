@@ -59,11 +59,11 @@ export default function ImpactStatsSection({ stats }: { stats: ImpactStatSeed[] 
   }, []);
 
   return (
-    <section id="impact" ref={sectionRef} className="py-24 bg-neutral-50 border-y border-neutral-100">
+    <section id="impact" ref={sectionRef} className="py-24 bg-neutral-50 dark:bg-gray-900 border-y border-neutral-100 dark:border-gray-800">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-black text-black mb-4">Nuestro Impacto</h2>
-          <p className="text-black/60 text-lg max-w-2xl mx-auto">Resultados tangibles del trabajo en equipo que construimos día a día junto a nuestros voluntarios.</p>
+          <h2 className="text-4xl font-black text-black dark:text-white mb-4">Nuestro Impacto</h2>
+          <p className="text-black/60 dark:text-gray-400 text-lg max-w-2xl mx-auto">Resultados tangibles del trabajo en equipo que construimos día a día junto a nuestros voluntarios.</p>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
@@ -72,7 +72,7 @@ export default function ImpactStatsSection({ stats }: { stats: ImpactStatSeed[] 
             return (
               <div 
                 key={stat.id} 
-                className={`flex flex-col items-center p-8 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.03)] transition-transform duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)]`}
+                className={`flex flex-col items-center p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.03)] transition-transform duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)]`}
                 style={{
                   transitionDelay: isVisible ? `${delay}ms` : '0ms',
                   opacity: isVisible ? 1 : 0,
@@ -90,12 +90,12 @@ export default function ImpactStatsSection({ stats }: { stats: ImpactStatSeed[] 
                   <div className="w-8 h-8 text-white" dangerouslySetInnerHTML={{ __html: stat.iconSvg }} />
                 </div>
                 {/* Number */}
-                <div className="text-4xl md:text-5xl font-black text-black mb-2 tracking-tight">
+                <div className="text-4xl md:text-5xl font-black text-black dark:text-white mb-2 tracking-tight">
                   {stat.prefix}
                   <Counter end={stat.value} visible={isVisible} />
                   <span className={`text-xl font-bold ml-1`} style={{ color: stat.colorVar.startsWith('brand-') ? `var(--color-${stat.colorVar})` : stat.colorVar }}>{stat.suffix}</span>
                 </div>
-                <div className="text-sm md:text-base text-black/60 font-medium uppercase tracking-wider text-center">{stat.label}</div>
+                <div className="text-sm md:text-base text-black/60 dark:text-gray-400 font-medium uppercase tracking-wider text-center">{stat.label}</div>
               </div>
             );
           })}

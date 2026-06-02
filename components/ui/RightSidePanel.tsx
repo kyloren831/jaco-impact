@@ -47,20 +47,20 @@ export function RightSidePanel({
 
       {/* Slide Panel */}
       <div
-        className={`fixed inset-y-0 right-0 z-[100] ${width} bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-in-out transform ${
+        className={`fixed inset-y-0 right-0 z-[100] ${width} bg-white dark:bg-gray-900 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-[#F9F8F6] shrink-0">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 bg-[#F9F8F6] dark:bg-gray-800 shrink-0">
           {title ? (
-            <h2 className="font-headline text-xl font-bold text-gray-900">{title}</h2>
+            <h2 className="font-headline text-xl font-bold text-gray-900 dark:text-gray-100">{title}</h2>
           ) : (
             <div></div> // empty div to push close button to the right if no title
           )}
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors"
+            className="p-2 text-gray-400 dark:text-gray-500 hover:text-black dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
             title="Cerrar panel"
             type="button"
           >

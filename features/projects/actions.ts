@@ -1,19 +1,15 @@
 "use server";
 
-import { requireAuth } from "@/lib/auth/guards";
+import { requireAuth, requireRole } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { uploadFileToR2 } from "@/lib/storage/r2";
 
 export async function createProject(formData: FormData) {
-  const session = await requireAuth();
+  const session = await requireRole(['ADMIN', 'COORDINATOR']);
   const roles = session.roles ?? [session.role];
   const isAdmin = roles.includes("ADMIN");
   const isCoordinator = roles.includes("COORDINATOR");
-
-  if (!isAdmin && !isCoordinator) {
-    return { success: false, error: "No tienes permisos para crear proyectos." };
-  }
 
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
@@ -55,7 +51,7 @@ export async function createProject(formData: FormData) {
 
     await prisma.project.create({
       data: {
-        createdBY: session.userId,
+        createdBy: session.userId,
         pillarId,
         name,
         description,
@@ -113,14 +109,10 @@ export async function getProjectById(id: number) {
 }
 
 export async function updateProject(id: number, formData: FormData) {
-  const session = await requireAuth();
+  const session = await requireRole(['ADMIN', 'COORDINATOR']);
   const roles = session.roles ?? [session.role];
   const isAdmin = roles.includes("ADMIN");
   const isCoordinator = roles.includes("COORDINATOR");
-
-  if (!isAdmin && !isCoordinator) {
-    return { success: false, error: "No tienes permisos para editar." };
-  }
 
   try {
     const existing = await prisma.project.findUnique({ 
@@ -184,7 +176,7 @@ export async function updateProject(id: number, formData: FormData) {
 }
 
 export async function deleteProject(id: number) {
-  const session = await requireAuth();
+  const session = await requireRole(['ADMIN', 'COORDINATOR']);
   const roles = session.roles ?? [session.role];
   const isAdmin = roles.includes("ADMIN");
 

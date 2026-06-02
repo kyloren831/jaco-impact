@@ -1,13 +1,17 @@
 "use server";
+import { initializeDomainEvents } from "@/domain/shared/init";
+initializeDomainEvents();
 
-import { requireAuth } from "@/lib/auth/guards";
-import { EventService } from "@/lib/services/event.service";
+import { requireRole, withRole } from "@/lib/auth/guards";
+import { EventDomainService } from "@/domain/events/service";
+import { EventStatus, Visibility } from "@/generated/prisma/client";
+import { CreateEventDTO, UpdateEventDTO } from "@/domain/events/event.types";
 
-const eventService = new EventService();
+const eventService = new EventDomainService();
 
 export async function getEventsByProject(projectId: number) {
   try {
-    const events = await eventService.getEventsByProjectId(projectId);
+    const events = await eventService.getEventsByProject(projectId);
     return { success: true, data: events };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -17,22 +21,29 @@ export async function getEventsByProject(projectId: number) {
 export async function getAllEvents() {
   try {
     const events = await eventService.getAllEvents();
-    return { success: true, data: events };
+    return { success: true, data: events.data };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
 }
 
-export async function createEvent(formData: FormData, projectId: number, status: string) {
+export async function getEventDetail(eventId: number) {
   try {
-    const session = await requireAuth();
-    
+    const event = await eventService.getEventDetails(eventId);
+    return { success: true, data: event };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export const createEvent = withRole(['ADMIN', 'COORDINATOR'], async (payload, formData: FormData, projectId: number, status: string) => {
+  try {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const location = formData.get("location") as string;
     const eventDateStr = formData.get("eventDate") as string;
     const volunteersNeeded = Number(formData.get("volunteersNeeded")) || 0;
-    const visibility = formData.get("visibility") as any || "PUBLIC";
+    const visibility = (formData.get("visibility") as any) || Visibility.PUBLIC;
     const startDateStr = formData.get("startDate") as string;
     const endDateStr = formData.get("endDate") as string;
 
@@ -40,7 +51,7 @@ export async function createEvent(formData: FormData, projectId: number, status:
       return { success: false, error: "Faltan campos obligatorios" };
     }
 
-    const data = {
+    const data: CreateEventDTO = {
       name,
       description: description || null,
       location: location || null,
@@ -50,23 +61,43 @@ export async function createEvent(formData: FormData, projectId: number, status:
       startDate: startDateStr ? new Date(startDateStr) : null,
       endDate: endDateStr ? new Date(endDateStr) : null,
       projectId,
-      status: status as any,
+      status: status as EventStatus,
     };
 
-    const event = await eventService.createEvent(data, session.userId);
+    const event = await eventService.createEvent(data, payload.userId);
     return { success: true, data: event };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
-}
+});
 
-export async function updateEventStatusAction(eventId: number, status: string) {
+export const updateEventStatusAction = withRole(['ADMIN', 'COORDINATOR'], async (payload, eventId: number, status: string) => {
   try {
-    await requireAuth(); // Solo usuarios autenticados pueden mover eventos
-    
-    const event = await eventService.updateEventStatus(eventId, status as any);
+    const event = await eventService.updateEventStatus(eventId, status as EventStatus, payload.userId);
     return { success: true, data: event };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
-}
+});
+
+export const updateEventDetailsAction = withRole(['ADMIN', 'COORDINATOR'], async (payload, eventId: number, data: UpdateEventDTO) => {
+  try {
+    if (data.name !== undefined && !data.name.trim()) {
+      return { success: false, error: "El nombre del evento no puede estar vacío" };
+    }
+
+    const event = await eventService.updateEventDetails(eventId, data, payload.userId);
+    return { success: true, data: event };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+});
+
+export const cancelEventAction = withRole(['ADMIN', 'COORDINATOR'], async (payload, eventId: number) => {
+  try {
+    const event = await eventService.updateEventStatus(eventId, EventStatus.CANCELLED, payload.userId);
+    return { success: true, data: event };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+});

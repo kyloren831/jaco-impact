@@ -62,28 +62,28 @@ export default function UserDropdown({ user }: UserDropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden transform opacity-100 scale-100 transition-all duration-200 origin-top-right">
-          <div className="p-4 border-b border-gray-100 bg-gray-50/50">
-            <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
-            <p className="text-xs text-gray-500 font-medium mt-0.5 truncate">{roleName}</p>
+        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden transform opacity-100 scale-100 transition-all duration-200 origin-top-right">
+          <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
+            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{user.name}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5 truncate">{roleName}</p>
           </div>
           <div className="py-1">
             <Link
               href="/dashboard/profile"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-verde/10 hover:text-brand-verde transition-colors"
+              className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-brand-verde/10 hover:text-brand-verde transition-colors"
             >
               Ver Perfil
             </Link>
             <Link
               href="/dashboard/profile/password"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-verde/10 hover:text-brand-verde transition-colors"
+              className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-brand-verde/10 hover:text-brand-verde transition-colors"
             >
               Cambiar Contraseña
             </Link>
             <ThemeToggle />
-            <div className="h-px bg-gray-100 my-1"></div>
+            <div className="h-px bg-gray-100 dark:bg-gray-700 my-1"></div>
             <button
               onClick={handleLogout}
               disabled={loggingOut}

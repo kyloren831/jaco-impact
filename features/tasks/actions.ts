@@ -1,11 +1,15 @@
 "use server";
+import { initializeDomainEvents } from "@/domain/shared/init";
+initializeDomainEvents();
 
-import { requireAuth } from "@/lib/auth/guards";
+import { requireRole } from "@/lib/auth/guards";
 import { TaskService } from "@/lib/services/task.service";
 import { VolunteerService } from "@/lib/services/volunteer.service";
+import { AssignmentService } from "@/domain/assignments/service";
 
 const taskService = new TaskService();
 const volunteerService = new VolunteerService();
+const assignmentService = new AssignmentService();
 
 export async function getTasksByEvent(eventId: number) {
   try {
@@ -18,7 +22,7 @@ export async function getTasksByEvent(eventId: number) {
 
 export async function createTaskAction(formData: FormData, eventId: number) {
   try {
-    const session = await requireAuth();
+    const session = await requireRole(['ADMIN', 'COORDINATOR']);
     
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
@@ -46,10 +50,17 @@ export async function createTaskAction(formData: FormData, eventId: number) {
       description: description || undefined,
       priority: priority || "MEDIUM",
       dueDate: dueDateStr ? new Date(dueDateStr) : undefined,
-      volunteerIds,
+      volunteerIds: [], // Assigned via assignmentService to respect invariants
     };
 
     const task = await taskService.createTask(data, session.userId);
+    
+    if (volunteerIds.length > 0) {
+      for (const vid of volunteerIds) {
+        await assignmentService.assignTask(task.id, vid, session.userId, eventId);
+      }
+    }
+
     return { success: true, data: task };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -58,7 +69,7 @@ export async function createTaskAction(formData: FormData, eventId: number) {
 
 export async function updateTaskStatusAction(taskId: number, status: string) {
   try {
-    await requireAuth();
+    await requireRole(['ADMIN', 'COORDINATOR']);
     
     const task = await taskService.updateTaskStatus(taskId, status as any);
     return { success: true, data: task };
@@ -78,8 +89,8 @@ export async function getAllVolunteersAction() {
 
 export async function assignVolunteerAction(taskId: number, volunteerId: number) {
   try {
-    await requireAuth();
-    const result = await taskService.assignVolunteerToTask(taskId, volunteerId);
+    const session = await requireRole(['ADMIN', 'COORDINATOR']);
+    const result = await assignmentService.assignTask(taskId, volunteerId, session.userId);
     return { success: true, data: result };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -88,9 +99,24 @@ export async function assignVolunteerAction(taskId: number, volunteerId: number)
 
 export async function removeVolunteerAction(taskId: number, volunteerId: number) {
   try {
-    await requireAuth();
-    const result = await taskService.removeVolunteerFromTask(taskId, volunteerId);
+    const session = await requireRole(['ADMIN', 'COORDINATOR']);
+    const result = await assignmentService.removeAssignment(taskId, volunteerId, session.userId);
     return { success: true, data: result };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateTaskDetailsAction(taskId: number, data: { title?: string; description?: string | null }) {
+  try {
+    await requireRole(['ADMIN', 'COORDINATOR']);
+
+    if (data.title !== undefined && !data.title.trim()) {
+      return { success: false, error: "El título de la tarea no puede estar vacío" };
+    }
+
+    const task = await taskService.updateTaskDetails(taskId, data);
+    return { success: true, data: task };
   } catch (error: any) {
     return { success: false, error: error.message };
   }

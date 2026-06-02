@@ -77,7 +77,7 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
             alt="Jaco Impact"
             width={180}
             height={52}
-            className={`h-[52px] w-auto opacity-92 ${variant === "dashboard" ? "brightness-0" : ""}`}
+            className={`h-[52px] w-auto opacity-92 ${variant === "dashboard" ? "brightness-0 dark:invert" : ""}`}
             priority
           />
         </Link>
@@ -85,31 +85,31 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
         {/* Desktop Menu */}
         <ul className="hidden md:flex gap-8">
           <li>
-            <a href="#about" onClick={(e) => handleSmoothScroll(e, "about")} className={`${variant === "dashboard" ? "text-gray-900" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
+            <a href="#about" onClick={(e) => handleSmoothScroll(e, "about")} className={`${variant === "dashboard" ? "text-gray-900 dark:text-gray-100" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
               Nosotros
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-verde transition-all group-hover:w-full"></span>
             </a>
           </li>
           <li>
-            <a href="#impact" onClick={(e) => handleSmoothScroll(e, "impact")} className={`${variant === "dashboard" ? "text-gray-900" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
+            <a href="#impact" onClick={(e) => handleSmoothScroll(e, "impact")} className={`${variant === "dashboard" ? "text-gray-900 dark:text-gray-100" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
               Impacto
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-verde transition-all group-hover:w-full"></span>
             </a>
           </li>
           <li>
-            <a href="#pilares" onClick={(e) => handleSmoothScroll(e, "pilares")} className={`${variant === "dashboard" ? "text-gray-900" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
+            <a href="#pilares" onClick={(e) => handleSmoothScroll(e, "pilares")} className={`${variant === "dashboard" ? "text-gray-900 dark:text-gray-100" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
               Pilares
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-verde transition-all group-hover:w-full"></span>
             </a>
           </li>
           <li>
-            <a href="#galeria" onClick={(e) => handleSmoothScroll(e, "galeria")} className={`${variant === "dashboard" ? "text-gray-900" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
+            <a href="#galeria" onClick={(e) => handleSmoothScroll(e, "galeria")} className={`${variant === "dashboard" ? "text-gray-900 dark:text-gray-100" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
               Actividades
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-verde transition-all group-hover:w-full"></span>
             </a>
           </li>
           <li>
-            <a href="#contact" onClick={(e) => handleSmoothScroll(e, "contact")} className={`${variant === "dashboard" ? "text-gray-900" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
+            <a href="#contact" onClick={(e) => handleSmoothScroll(e, "contact")} className={`${variant === "dashboard" ? "text-gray-900 dark:text-gray-100" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
               Contacto
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-verde transition-all group-hover:w-full"></span>
             </a>
@@ -139,9 +139,9 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
           className="md:hidden flex flex-col gap-1.5 p-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          <span className={`w-6 h-0.5 ${variant === "dashboard" ? "bg-black" : "bg-white"} transition-all ${mobileMenuOpen ? "rotate-45 translate-y-2" : ""}`}></span>
-          <span className={`w-6 h-0.5 ${variant === "dashboard" ? "bg-black" : "bg-white"} transition-all ${mobileMenuOpen ? "opacity-0" : ""}`}></span>
-          <span className={`w-6 h-0.5 ${variant === "dashboard" ? "bg-black" : "bg-white"} transition-all ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`}></span>
+          <span className={`w-6 h-0.5 ${variant === "dashboard" ? "bg-black dark:bg-white" : "bg-white"} transition-all ${mobileMenuOpen ? "rotate-45 translate-y-2" : ""}`}></span>
+          <span className={`w-6 h-0.5 ${variant === "dashboard" ? "bg-black dark:bg-white" : "bg-white"} transition-all ${mobileMenuOpen ? "opacity-0" : ""}`}></span>
+          <span className={`w-6 h-0.5 ${variant === "dashboard" ? "bg-black dark:bg-white" : "bg-white"} transition-all ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`}></span>
         </button>
 
         {/* Mobile Menu */}

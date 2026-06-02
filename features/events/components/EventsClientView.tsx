@@ -53,10 +53,10 @@ export function EventsClientView({ project }: EventsClientViewProps) {
       <div className="flex flex-col items-start gap-4 mb-2">
         <div className="w-full flex justify-between items-start">
           <div>
-            <h1 className="font-headline text-4xl font-black text-black">
+            <h1 className="font-headline text-4xl font-black text-black dark:text-white">
               {project ? (
                 <>
-                  <Link href="/dashboard/admin/projects" className="text-gray-400 font-bold hover:text-gray-600 transition-colors">
+                  <Link href="/dashboard/admin/projects" className="text-gray-400 font-bold hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                     Proyectos
                   </Link>
                   <span className="text-gray-400 font-bold"> / </span>
@@ -86,7 +86,7 @@ export function EventsClientView({ project }: EventsClientViewProps) {
         {project && (
           <Link
             href="/dashboard/admin/projects"
-            className="px-4 py-2 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:shadow-sm transition-all text-gray-600 hover:text-black flex items-center gap-2 font-body text-sm font-medium"
+            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm transition-all text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white flex items-center gap-2 font-body text-sm font-medium"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -97,7 +97,7 @@ export function EventsClientView({ project }: EventsClientViewProps) {
       </div>
 
       {/* Tabs Submenu */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-gray-200 dark:border-gray-800">
         <button
           onClick={() => setViewMode("board")}
           className={`px-6 py-3 font-body text-sm font-bold transition-all relative ${
@@ -125,7 +125,7 @@ export function EventsClientView({ project }: EventsClientViewProps) {
       {/* Views */}
       {loading ? (
         <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-          <div className="w-10 h-10 border-4 border-gray-200 border-t-black rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-gray-200 dark:border-gray-700 border-t-black dark:border-t-white rounded-full animate-spin"></div>
         </div>
       ) : events.length === 0 ? (
         <div className="flex-1 flex items-center justify-center min-h-[50vh]">
@@ -178,6 +178,7 @@ export function EventsClientView({ project }: EventsClientViewProps) {
         event={events.find(e => e.id === selectedEventId) || null}
         isOpen={!!selectedEventId}
         onClose={() => setSelectedEventId(null)}
+        onEventUpdated={fetchEvents}
       />
     </div>
   );

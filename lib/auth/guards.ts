@@ -33,22 +33,55 @@ export async function requireAuth(): Promise<AccessTokenPayload> {
 }
 
 // ── Require specific role ──────────────────────────────────────────
-/**
- * Valida que el usuario tenga el rol requerido.
- * Llama a requireAuth() internamente.
- */
-export async function requireRole(role: string): Promise<AccessTokenPayload> {
+export async function requireRole(allowedRoles: string | string[]): Promise<AccessTokenPayload> {
   const payload = await requireAuth();
 
-  // Verifica en el array de roles (más flexible que solo el rol principal)
   const userRoles = payload.roles ?? [payload.role];
+  const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
-  if (!userRoles.includes(role)) {
+  const hasRole = userRoles.some(role => rolesArray.includes(role));
+
+  if (!hasRole) {
     throw new AuthError(
       "FORBIDDEN",
-      `Se requiere el rol '${role}' para acceder a este recurso`
+      `Se requiere uno de los siguientes roles: ${rolesArray.join(", ")}`
     );
   }
 
   return payload;
+}
+
+// ── Require ownership ──────────────────────────────────────────────
+/**
+ * Valida que el usuario autenticado sea el dueño del recurso.
+ */
+export async function requireOwnership(resourceOwnerId: number | string): Promise<AccessTokenPayload> {
+  const payload = await requireAuth();
+  
+  if (String(payload.id) !== String(resourceOwnerId)) {
+    throw new AuthError("FORBIDDEN", "No tienes permisos para modificar este recurso");
+  }
+  
+  return payload;
+}
+
+// ── Higher-Order Action Wrappers ───────────────────────────────────
+
+export function withAuth<T, Args extends any[]>(
+  action: (payload: AccessTokenPayload, ...args: Args) => Promise<T>
+) {
+  return async (...args: Args): Promise<T> => {
+    const payload = await requireAuth();
+    return action(payload, ...args);
+  };
+}
+
+export function withRole<T, Args extends any[]>(
+  roles: string | string[],
+  action: (payload: AccessTokenPayload, ...args: Args) => Promise<T>
+) {
+  return async (...args: Args): Promise<T> => {
+    const payload = await requireRole(roles);
+    return action(payload, ...args);
+  };
 }

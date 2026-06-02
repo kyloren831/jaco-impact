@@ -10,7 +10,7 @@ export default async function DashboardLayout({
   const user = userResult.success ? userResult.data : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col font-sans transition-colors duration-300">
       <div className="flex-1 flex flex-col relative">
         {user && <UserDropdown user={user} />}
         {children}

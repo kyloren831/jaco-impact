@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -21,7 +19,6 @@ enum Role {
   PYME_MANAGER
 }
 
-//Status
 enum ProjectStatus {
   DRAFT
   PUBLISHED
@@ -47,13 +44,16 @@ enum TaskStatus {
 }
 
 enum AssignmentStatus {
-  ASSIGNED
+  PENDING_ACCEPTANCE
   ACCEPTED
   DECLINED
   IN_PROGRESS
   SUBMITTED
+  UNDER_REVIEW
+  REVISION_REQUESTED
   APPROVED
   REJECTED
+  CANCELLED
 }
 
 enum ReviewStatus {
@@ -75,7 +75,6 @@ enum ParticipationStatus {
   CANCELLED
 }
 
-//------
 enum TaskPrio {
   LOW
   MEDIUM
@@ -94,6 +93,36 @@ enum FileType {
   OTHER
 }
 
+enum NotificationType {
+  TASK_ASSIGNMENT
+  TASK_COMMENT
+  TASK_EVIDENCE
+  EVENT_UPDATE
+  PROJECT_UPDATE
+  REVIEW_REQUEST
+  GENERAL
+}
+
+enum ActivityAction {
+  CREATED
+  UPDATED
+  DELETED
+  STATUS_CHANGED
+  REGISTERED
+  UNREGISTERED
+  ASSIGNED
+  ACCEPTED
+  DECLINED
+  SUBMITTED
+  REVIEWED
+  CANCELLED
+}
+
+enum ActorType {
+  USER
+  SYSTEM
+}
+
 //--------------------------------------------------
 //Schema (Tablas de la bd)
 model User {
@@ -104,36 +133,20 @@ model User {
   imageUrl         String?        @db.VarChar(255)
   isActive         Boolean
   createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
   userRoles        UserRole[]
-  //Relacion 1 to 1 con voluntarios
-  //Un usuario solo puede un voluntario y un voluntario solo puede ser un usuario
   volunteers       Volunteer?
-  //Relacion 1 to 1 con pillar
-  //Pillar solo puede tener un coordinador
-  //Es opcional para el usuario
   pillar           Pillar?
-  //Relacion 1 to Many
-  //Un usuario puede crear muchos proyectos
   projects         Project[]
-  //Relacion 1 to Many
-  //Un usuario puede crear muchos eventos
   events           Event[]
-  //Relacion 1 to Many
-  //Un usuario puede crear muchas eventos
   tasks            Task[]
-  //Relacion 1 to Many
-  //Un usuario puede revisar muchas evidencias de tareas
   evidenceReviewed TaskEvidence[]
-  //Relacion 1 to 1
-  //Una pyme solo puede tener un manager
   pyme             PymeManager?
-  //Relacion 1 to many
-  //Un usuario puede crear muchos posts
   posts            BlogPost[]
-  //Relacion 1 to many
-  //Un usuario puede tener muchas sesiones asociadas
-  //Estas sesiones no tiene porque estar activas
   sessions         Session[]
+  notifications    Notification[]
+  activityLogs     ActivityLog[]  @relation("ActorLogs")
+  taskComments     TaskComment[]
 
   @@map("users")
 }
@@ -143,9 +156,8 @@ model UserRole {
   role   Role
   user   User @relation(fields: [userId], references: [id])
 
-  //Con la clave primaria compuesta nos aseguramos de que no se repita esta convinacion
-  //Es decir, un usuario no puede tener dos veces el mismo rol 
   @@id([userId, role])
+  @@index([userId])
   @@map("user_roles")
 }
 
@@ -159,6 +171,9 @@ model Session {
   expiresAt   DateTime
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("sessions")
 }
 
 model Pillar {
@@ -169,51 +184,35 @@ model Pillar {
   iconUrl       String
   color         String    @db.VarChar(30)
   isActive      Boolean   @default(true)
-  //Relacion 1 to 1 
-  //Se puede cambiar de 1 to Many
   coordinator   User?     @relation(fields: [coordinatorId], references: [id])
-  //Relacion 1 to Many 
-  //Un pillar puede tener muchos proyectos
   projects      Project[]
   news          News[]
 
+  @@index([coordinatorId])
   @@map("pillars")
 }
 
 model Volunteer {
   id                    Int                     @id @default(autoincrement())
-  userId                Int                     @unique //se pone unique para la relacion 1 to 1 
+  userId                Int                     @unique
   phone                 String
   nationality           String
   profession            String
   emergencyContactName  String
   emergencyContactPhone String
   inmediateAvailability Boolean
-  //timestamps
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt
-  //Relacion 1 to 1 con usuario
   user                  User                    @relation(fields: [userId], references: [id])
-  //Relacion 1 to Many
-  //Un voluntario puede tener muchas skills
   skills                VolunteerSkill[]
-  //Relacion 1 to Many
-  //Un voluntario puede tener muchas disponibilidades
   availability          VolunteerAvailability[]
-  //Relacion 1 to Many
-  //Un voluntario puede tener muchas tareas asignadas
-  tasks                 TaskVolunteer[]
-  //Relacion 1 to Many
-  //Un voluntario puede tener muchas evidencias entregadas
+  assignments           TaskAssignment[]
   taskEvidences         TaskEvidence[]
-  //Relacion Many to Many
-  //Un Voluntario puede participar en muchjos eventos
-  events                EventVolunteer[]
-  //Relacion 1 to Many
-  //Un Voluntario puede escribir muchas reseñas
+  participations        EventParticipation[]
   reviews               ProjectReview[]
   news                  News[]
 
+  @@index([userId])
   @@map("volunteers")
 }
 
@@ -223,12 +222,11 @@ model VolunteerAvailability {
   startDate   DateTime
   endDate     DateTime
   notes       String?   @db.Text
-  //timestamps
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  //Una disponibilidad pertenece a un solo voluntario
   volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
 
+  @@index([volunteerId])
   @@map("volunteer_availabilities")
 }
 
@@ -237,195 +235,174 @@ model VolunteerSkill {
   volunteerId Int
   name        String    @db.VarChar(100)
   description String    @db.Text
-  //Una Skill pertenece solo a un voluntario
   volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
 
+  @@index([volunteerId])
   @@map("volunteer_skills")
 }
 
 model Project {
   id          Int             @id @default(autoincrement())
   pillarId    Int
-  createdBY   Int // id del usuario que creo el proyecto
+  createdBy   Int
   name        String          @db.VarChar(150)
   description String          @db.Text
   photoUrl    String?         @db.VarChar(255)
   objectives  String?         @db.Text
   status      ProjectStatus
   visibility  Visibility
-  //timestamps
   startDate   DateTime?
   endDate     DateTime?
   publishedAt DateTime?
   createdAt   DateTime        @default(now())
-  //Cada proyecto solo pertenece a un pillar
+  updatedAt   DateTime        @updatedAt
   pillar      Pillar          @relation(fields: [pillarId], references: [id])
-  //Cada proyecto tiene un solo creador
-  creator     User            @relation(fields: [createdBY], references: [id])
-  //Relacion 1 to Many
-  //Un projecto puede tener muchos eventos relacionados
+  creator     User            @relation(fields: [createdBy], references: [id])
   events      Event[]
-  //Relacion 1 to Many
-  //Un proyecto puede tener muchas reseñas
   reviews     ProjectReview[]
   news        News[]
 
+  @@index([pillarId])
+  @@index([createdBy])
   @@map("projects")
 }
 
 model Event {
-  id               Int              @id @default(autoincrement())
+  id               Int                  @id @default(autoincrement())
   projectId        Int
-  createdBY        Int // id del usuario que creo el evento
+  createdBy        Int
   visibility       Visibility
-  name             String           @db.VarChar(150)
-  description      String?          @db.Text
+  name             String               @db.VarChar(150)
+  description      String?              @db.Text
   eventDate        DateTime
-  location         String?          @db.VarChar(150)
-  volunteersNeeded Int              @default(0)
+  location         String?              @db.VarChar(150)
+  volunteersNeeded Int                  @default(0)
   status           EventStatus
-  //timestamps
   startDate        DateTime?
   endDate          DateTime?
   publishedAt      DateTime?
-  createdAt        DateTime         @default(now())
-  //Cada evento tiene un solo creador
-  creator          User             @relation(fields: [createdBY], references: [id])
-  //Un evento solo pertenece a un proyecto
-  project          Project          @relation(fields: [projectId], references: [id])
-  //Relacion 1 to Many
-  //Un evento puede tener muchas tareas
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  creator          User                 @relation(fields: [createdBy], references: [id])
+  project          Project              @relation(fields: [projectId], references: [id])
   tasks            Task[]
-  //Relacion Many to Many
-  //Un evento puede tener muchos asistentes
-  volunteers       EventVolunteer[]
+  participations   EventParticipation[]
   news             News[]
 
+  @@index([projectId])
+  @@index([createdBy])
   @@map("events")
 }
 
 model Task {
-  id            Int             @id @default(autoincrement())
+  id            Int              @id @default(autoincrement())
   eventId       Int
-  createdBY     Int // id del usuario que creo la tarea
-  title         String          @db.VarChar(150)
-  description   String?         @db.Text
+  createdBy     Int
+  title         String           @db.VarChar(150)
+  description   String?          @db.Text
   priority      TaskPrio
   taskStatus    TaskStatus
-  //timestamps
   startDate     DateTime?
   dueDate       DateTime?
-  createdAt     DateTime        @default(now())
-  //Cada evento tiene un solo creador
-  creator       User            @relation(fields: [createdBY], references: [id])
-  //Una tarea pertenece solo a un evento
-  event         Event           @relation(fields: [eventId], references: [id])
-  //Relacion 1 to Many
-  //Una tarea puede tener varios responsables
-  assignedTo    TaskVolunteer[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  creator       User             @relation(fields: [createdBy], references: [id])
+  event         Event            @relation(fields: [eventId], references: [id])
+  assignments   TaskAssignment[]
   taskEvidences TaskEvidence[]
+  comments      TaskComment[]
 
+  @@index([eventId])
+  @@index([createdBy])
   @@map("tasks")
 }
 
-//ASK-->Una tarea puede estar asignada a muchos volutarios o solo a uno?
-model TaskVolunteer {
+model TaskAssignment {
   taskId         Int
   volunteerId    Int
+  eventId        Int
+  assignedBy     Int?
   assignedAt     DateTime         @default(now())
   acceptedAt     DateTime?
+  declinedAt     DateTime?
+  declineReason  String?          @db.Text
   startedAt      DateTime?
   submittedAt    DateTime?
   completedAt    DateTime?
   status         AssignmentStatus
   completionNote String?          @db.Text
-  task           Task             @relation(fields: [taskId], references: [id])
-  volunteer      Volunteer        @relation(fields: [volunteerId], references: [id])
+  updatedAt      DateTime         @updatedAt
 
-  //Llave compuesta para asegurar que una tarea pueda ser asignada una sola vez por voluntario
+  task               Task               @relation(fields: [taskId], references: [id])
+  volunteer          Volunteer          @relation(fields: [volunteerId], references: [id])
+  eventParticipation EventParticipation @relation(fields: [eventId, volunteerId], references: [eventId, volunteerId])
+  evidences          TaskEvidence[]
+
   @@id([taskId, volunteerId])
-  @@map("tasks_volunteers")
+  @@index([eventId, volunteerId])
+  @@index([volunteerId])
+  @@map("task_assignments")
 }
 
-//TODO--> Se debe validar que el usuario si tenga asignaciones a esta tarea
 model TaskEvidence {
-  id           Int          @id @default(autoincrement())
-  taskId       Int
-  volunteerId  Int
-  reviewBy     Int? //Persona que revisa la evidencia
-  fileUrl      String       @db.Text
-  fileType     FileType
-  description  String?      @db.Text
-  uploadedAt   DateTime     @default(now())
-  status       ReviewStatus
-  //Una evidencia pertenece a una tarea 
-  task         Task         @relation(fields: [taskId], references: [id])
-  //Una evidencia pertenece a un voluntario
-  volunteer    Volunteer    @relation(fields: [volunteerId], references: [id])
-  //Una evidencia solo puede ser revisada por una persona
-  userReviewed User?        @relation(fields: [reviewBy], references: [id])
+  id          Int          @id @default(autoincrement())
+  taskId      Int
+  volunteerId Int
+  reviewBy    Int?
+  fileUrl     String       @db.Text
+  fileName    String       @db.VarChar(255)
+  fileSize    Int          @default(0)
+  fileType    FileType
+  description String?      @db.Text
+  reviewNote  String?      @db.Text
+  uploadedAt  DateTime     @default(now())
+  reviewedAt  DateTime?
+  status      ReviewStatus
+  updatedAt   DateTime     @updatedAt
 
+  task         Task           @relation(fields: [taskId], references: [id])
+  volunteer    Volunteer      @relation(fields: [volunteerId], references: [id])
+  assignment   TaskAssignment @relation(fields: [taskId, volunteerId], references: [taskId, volunteerId])
+  userReviewed User?          @relation(fields: [reviewBy], references: [id])
+
+  @@index([taskId, volunteerId])
+  @@index([volunteerId])
+  @@index([reviewBy])
   @@map("tasks_evidences")
 }
 
-//ASK-->Preguntar si es necesario que las tareas pueden tener comentarios
-//TODO-->Crear tabla Tasks_Comments
-/**
- * Table task_comments {
- * id uuid [pk]
- * task_id uuid [not null, ref: > tasks.id]
- * user_id uuid [not null, ref: > users.id]
- * comment text [not null]
- * created_at timestamp [not null]
- * }
- */
-//ASK-->Es necesario guardar el historial de cambios de una tarea en una tabla?
-//TODO-->Crear tabla task_status_history
-/**
- * Table task_status_history {
- * id uuid [pk]
- * task_id uuid [not null, ref: > tasks.id]
- * changed_by uuid [not null, ref: > users.id]
- * old_status varchar(30)
- * new_status varchar(30) [not null]
- * note text
- * changed_at timestamp [not null]
- * }
- */
+model TaskComment {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  authorId  Int
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-//Tabla secundaria
-//Relacion Many to Many 
-model EventVolunteer {
+  task   Task @relation(fields: [taskId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
+
+  @@index([taskId])
+  @@index([authorId])
+  @@map("task_comments")
+}
+
+model EventParticipation {
   eventId      Int
   volunteerId  Int
   status       ParticipationStatus @default(REGISTERED)
   registeredAt DateTime            @default(now())
-  //Un voluntario puede asistir a muchos eventos 
-  volunteer    Volunteer           @relation(fields: [volunteerId], references: [id])
-  //A un evento pueden asistir muchos voluntarios
-  event        Event               @relation(fields: [eventId], references: [id])
+  updatedAt    DateTime            @updatedAt
 
-  //Clave primaria compuesta para que un voluntario no se pueda apuntar mas de una vez a un evento
+  volunteer   Volunteer        @relation(fields: [volunteerId], references: [id])
+  event       Event            @relation(fields: [eventId], references: [id])
+  assignments TaskAssignment[]
+
   @@id([eventId, volunteerId])
-  @@map("events_volunteers")
+  @@index([volunteerId])
+  @@map("event_participations")
 }
 
-//ASK-->Hay que guardar las notificaciones? 
-/**
- * Table notifications {
- * id uuid [pk]
- * user_id uuid [not null, ref: > users.id]
- * title varchar(150) [not null]
- * message text [not null]
- * type varchar(50) [not null, note: "TASK_ASSIGNMENT, TASK_COMMENT, TASK_EVIDENCE, EVENT_UPDATE, PROJECT_UPDATE, REVIEW_REQUEST, GENERAL"]
- * related_entity_type varchar(50)
- * related_entity_id uuid
- * is_read boolean [not null, default: false]
- * created_at timestamp [not null]
- * }
- */
-
-//ASK--> las reviews son solo para proyectos o tambien para eventos?
 model ProjectReview {
   id          Int       @id @default(autoincrement())
   projectId   Int
@@ -433,11 +410,11 @@ model ProjectReview {
   rating      Int
   comment     String    @db.Text
   createdAt   DateTime  @default(now())
-  //Cada review pertenece a un proyecto
   project     Project   @relation(fields: [projectId], references: [id])
-  //Una review es escrita por un unico voluntario
   volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
 
+  @@index([projectId])
+  @@index([volunteerId])
   @@map("projects_reviews")
 }
 
@@ -450,16 +427,12 @@ model Pyme {
   email         String?      @db.VarChar(150)
   logoUrl       String?      @db.Text
   coverImageUrl String?      @db.Text
-  catalogSlug   String       @unique @db.VarChar(100) //URL personalizada para el catalogo de productos
+  catalogSlug   String       @unique @db.VarChar(100)
   isActive      Boolean      @default(true)
   isFeatured    Boolean      @default(false)
-  publishedAt   DateTime? //Fecha en que se publicó o publicará el catalogo
+  publishedAt   DateTime?
   createdAt     DateTime     @default(now())
-  //Relacion 1 to 1 
-  //Una pyme solo puede tener un manager y un manager solo puede estar asociado a una pyme
   manager       PymeManager?
-  //Relacion 1 to many
-  //Una pyme puede tener muchos productos
   products      Product[]
 
   @@map("pymes")
@@ -472,11 +445,7 @@ model PymeManager {
   name   String  @db.VarChar(150)
   phone  String  @db.VarChar(30)
   email  String? @db.VarChar(150)
-  //Relacion 1 to 1
-  //una pyme solo puede tener 1 manager 
   user   User    @relation(fields: [userId], references: [id])
-  //Relacion 1 to 1 
-  //Una pyme solo puede tener un manager y un manager solo puede estar asociado a una pyme
   pyme   Pyme    @relation(fields: [pymeId], references: [id])
 
   @@map("pymes_managers")
@@ -488,38 +457,41 @@ model Product {
   name        String    @db.VarChar(150)
   description String    @db.Text
   price       Decimal   @db.Decimal(12, 2)
-  imagenUrl   String    @db.Text
+  imageUrl    String    @db.Text
   isFeatured  Boolean   @default(false)
   isActive    Boolean   @default(true)
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
-  //Relacion 1 to many
-  //Un producto pertenece solo a una pyme
   pyme        Pyme      @relation(fields: [pymeId], references: [id])
 
+  @@index([pymeId])
   @@map("products")
 }
 
 model News {
   id          Int        @id @default(autoincrement())
   pillarId    Int
-  projectId   Int? //No es obligatorio que una noticia esté  relacionada a un project
-  eventId     Int? //No es obligatorio que una noticia esté  relacionada a un event
-  createdBy   Int //Voluntario que crea la noticia
+  projectId   Int?
+  eventId     Int?
+  createdBy   Int
   title       String     @db.VarChar(180)
   summary     String?    @db.Text
   content     String     @db.Text
-  imagenUrl   String     @db.Text
+  imageUrl    String     @db.Text
   status      BlogStatus @default(DRAFT)
-  PUBLISHEDaT DateTime?
-  CREATEDaT   DateTime   @default(now())
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
 
-  //TODO-->HACER COMENTARIOS DE RELACIONES
-  //Relaciones 1 to many
   pillar  Pillar    @relation(fields: [pillarId], references: [id])
   project Project?  @relation(fields: [projectId], references: [id])
   event   Event?    @relation(fields: [eventId], references: [id])
   creator Volunteer @relation(fields: [createdBy], references: [id])
+
+  @@index([pillarId])
+  @@index([projectId])
+  @@index([eventId])
+  @@index([createdBy])
+  @@map("news")
 }
 
 model BlogPost {
@@ -528,33 +500,51 @@ model BlogPost {
   title       String     @db.VarChar(180)
   summary     String?    @db.Text
   content     String     @db.Text
-  imagenUrl   String     @db.Text
+  imageUrl    String     @db.Text
   status      BlogStatus @default(DRAFT)
   publishedAt DateTime?
   createdAt   DateTime   @default(now())
-  //Relacion 1 to many 
-  //Cada post tiene un autor unico
   author      User       @relation(fields: [authorId], references: [id])
 
+  @@index([authorId])
   @@map("blog_posts")
 }
 
-//TODO-->Crear tabla de metricas
-/**
- * Table pillar_metrics {
- * id uuid [pk]
- * pillar_id uuid [not null, ref: > pillars.id]
- * metric_date date [not null]
- * projects_count int [not null, default: 0]
- * events_count int [not null, default: 0]
- * volunteers_count int [not null, default: 0]
- * beneficiaries_count int [not null, default: 0]
- * pymes_count int [not null, default: 0]
- * products_count int [not null, default: 0]
- * news_count int [not null, default: 0]
- * notes text
- * indexes {
- * (pillar_id, metric_date) [unique]
- * }
- * }
- */
+model Notification {
+  id                Int              @id @default(autoincrement())
+  userId            Int
+  title             String           @db.VarChar(150)
+  message           String           @db.Text
+  type              NotificationType
+  relatedEntityType String?          @db.VarChar(50)
+  relatedEntityId   String?          @db.VarChar(50)
+  actionUrl         String?          @db.VarChar(255)
+  isRead            Boolean          @default(false)
+  createdAt         DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+model ActivityLog {
+  id            Int            @id @default(autoincrement())
+  actorId       Int
+  actorType     ActorType
+  action        ActivityAction
+  entityType    String         @db.VarChar(50)
+  entityId      Int
+  eventId       Int?
+  previousState Json?
+  newState      Json?
+  createdAt     DateTime       @default(now())
+
+  actor User @relation("ActorLogs", fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([eventId, createdAt])
+  @@index([actorId])
+  @@map("activity_logs")
+}

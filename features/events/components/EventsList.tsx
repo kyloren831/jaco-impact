@@ -40,11 +40,11 @@ export function EventsList({ events, project, onUpdateEvents, onEventClick }: Ev
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden animate-[fadeIn_0.5s_ease-out]">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden animate-[fadeIn_0.5s_ease-out]">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
+            <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
               <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Evento</th>
               {!project && (
                 <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Proyecto</th>
@@ -54,19 +54,19 @@ export function EventsList({ events, project, onUpdateEvents, onEventClick }: Ev
               <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {events.map((event) => {
               const statusInfo = getStatusInfo(event.status);
 
               return (
                 <tr 
                   key={event.id} 
-                  className="hover:bg-gray-50/50 transition-colors cursor-pointer"
+                  className="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
                   onClick={() => onEventClick && onEventClick(event.id)}
                 >
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="font-headline font-bold text-gray-900">{event.name || "Evento sin título"}</span>
+                      <span className="font-headline font-bold text-gray-900 dark:text-gray-100">{event.name || "Evento sin título"}</span>
                       {event.location && (
                         <span className="font-body text-xs text-gray-500 flex items-center gap-1 mt-1">
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,7 +82,7 @@ export function EventsList({ events, project, onUpdateEvents, onEventClick }: Ev
                   {!project && (
                     <td className="px-6 py-4">
                       {event.project ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 font-body text-xs font-semibold border border-blue-100">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-body text-xs font-semibold border border-blue-100 dark:border-blue-800/30">
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                           </svg>
@@ -95,7 +95,7 @@ export function EventsList({ events, project, onUpdateEvents, onEventClick }: Ev
                   )}
 
                   <td className="px-6 py-4">
-                    <div className="font-body text-sm font-medium text-gray-600 flex items-center gap-2">
+                    <div className="font-body text-sm font-medium text-gray-600 dark:text-gray-400 flex items-center gap-2">
                       <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -128,7 +128,7 @@ export function EventsList({ events, project, onUpdateEvents, onEventClick }: Ev
                       {/* Dropdown Menu */}
                       {activeDropdown === event.id && (
                         <div
-                          className="absolute left-0 top-full mt-1.5 w-44 bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-1.5 flex flex-col"
+                          className="absolute left-0 top-full mt-1.5 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-20 py-1.5 flex flex-col"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Mover a</p>
@@ -136,7 +136,7 @@ export function EventsList({ events, project, onUpdateEvents, onEventClick }: Ev
                             <button
                               key={s.id}
                               onClick={() => handleChangeStatus(event.id, s.id)}
-                              className="px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
+                              className="px-3 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors"
                             >
                               <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }}></span>
                               {s.label}
@@ -148,7 +148,7 @@ export function EventsList({ events, project, onUpdateEvents, onEventClick }: Ev
                   </td>
 
                   <td className="px-6 py-4 text-right">
-                    <button className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors">
+                    <button className="p-2 text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                       </svg>

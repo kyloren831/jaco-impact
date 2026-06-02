@@ -115,11 +115,11 @@ export function EventsBoard({ events, project, onUpdateEvents, onAddEvent, onEve
             {/* Column Header */}
             <div className="p-4 flex items-center justify-between pb-2">
               <div className="flex items-center gap-3">
-                <h3 className="font-headline font-bold text-gray-900" style={{ color: status.color }}>
+                <h3 className="font-headline font-bold text-gray-900 dark:text-gray-100" style={{ color: status.color }}>
                   {status.label}
                 </h3>
               </div>
-              <span className="text-xs font-bold px-2.5 py-1 bg-white/60 rounded-full text-gray-700 shadow-sm border border-white/50">
+              <span className="text-xs font-bold px-2.5 py-1 bg-white/60 dark:bg-black/60 rounded-full text-gray-700 dark:text-gray-300 shadow-sm border border-white/50 dark:border-black/50">
                 {statusEvents.length}
               </span>
             </div>
@@ -132,13 +132,13 @@ export function EventsBoard({ events, project, onUpdateEvents, onAddEvent, onEve
                   draggable={true}
                   onDragStart={(e) => handleDragStart(e, event.id)}
                   onClick={() => onEventClick && onEventClick(event.id)}
-                  className={`bg-white p-4 rounded-xl shadow-[0_2px_8px_-4px_rgba(0,0,0,0.1)] border border-gray-100 hover:shadow-md transition-all cursor-grab active:cursor-grabbing group relative ${draggedEventId === event.id ? 'opacity-50' : ''}`}
+                  className={`bg-white dark:bg-gray-800 p-4 rounded-xl shadow-[0_2px_8px_-4px_rgba(0,0,0,0.1)] border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all cursor-grab active:cursor-grabbing group relative ${draggedEventId === event.id ? 'opacity-50' : ''}`}
                 >
                   <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl opacity-80" style={{ backgroundColor: status.color }}></div>
 
                   <div className="pl-2">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-headline text-base font-bold text-gray-900 leading-tight flex-1 mr-2">
+                      <h4 className="font-headline text-base font-bold text-gray-900 dark:text-gray-100 leading-tight flex-1 mr-2">
                         {event.name || "Evento sin título"}
                       </h4>
 
@@ -149,7 +149,7 @@ export function EventsBoard({ events, project, onUpdateEvents, onAddEvent, onEve
                             e.stopPropagation();
                             setActiveDropdown(activeDropdown === event.id ? null : event.id);
                           }}
-                          className="p-1 text-gray-400 hover:text-black hover:bg-gray-100 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                          className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors opacity-0 group-hover:opacity-100"
                           title="Cambiar estado"
                         >
                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -159,7 +159,7 @@ export function EventsBoard({ events, project, onUpdateEvents, onAddEvent, onEve
 
                         {activeDropdown === event.id && (
                           <div
-                            className="absolute right-0 top-7 mt-1 w-44 bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-1.5 flex flex-col"
+                            className="absolute right-0 top-7 mt-1 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-20 py-1.5 flex flex-col"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Mover a</p>
@@ -167,7 +167,7 @@ export function EventsBoard({ events, project, onUpdateEvents, onAddEvent, onEve
                               <button
                                 key={s.id}
                                 onClick={() => handleChangeStatus(event.id, s.id)}
-                                className="px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
+                                className="px-3 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors"
                               >
                                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }}></span>
                                 {s.label}
@@ -225,7 +225,7 @@ export function EventsBoard({ events, project, onUpdateEvents, onAddEvent, onEve
               e.stopPropagation();
               setShowColumnPicker(!showColumnPicker);
             }}
-            className="w-80 py-4 rounded-2xl border-2 border-dashed border-gray-300 hover:border-gray-400 bg-white/50 hover:bg-white/80 transition-all flex items-center justify-center gap-2 text-sm font-body font-semibold text-gray-400 hover:text-gray-600"
+            className="w-80 py-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all flex items-center justify-center gap-2 text-sm font-body font-semibold text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -235,7 +235,7 @@ export function EventsBoard({ events, project, onUpdateEvents, onAddEvent, onEve
 
           {showColumnPicker && (
             <div
-              className="absolute left-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-1.5 flex flex-col"
+              className="absolute left-0 top-full mt-2 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-20 py-1.5 flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Agregar estado</p>
@@ -246,7 +246,7 @@ export function EventsBoard({ events, project, onUpdateEvents, onAddEvent, onEve
                     setManualColumns(prev => [...prev, s.id]);
                     setShowColumnPicker(false);
                   }}
-                  className="px-3 py-2 text-sm text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
+                  className="px-3 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors"
                 >
                   <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }}></span>
                   {s.label}

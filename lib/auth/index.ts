@@ -19,6 +19,6 @@ export {
   revokeAllUserSessions,
 } from "./session";
 
-export { requireAuth, requireRole, AuthError } from "./guards";
+export { requireAuth, requireRole, requireOwnership, withAuth, withRole, AuthError } from "./guards";
 
 export { apiFetch } from "./apiFetch";

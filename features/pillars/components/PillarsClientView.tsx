@@ -50,7 +50,7 @@ export default function PillarsClientView({ initialPillars, coordinators }: Prop
         {filteredPillars.map((pillar) => (
           <div 
             key={pillar.id} 
-            className="bg-white/80 backdrop-blur-xl border border-white rounded-3xl p-6 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 group flex flex-col"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white dark:border-gray-700 rounded-3xl p-6 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 group flex flex-col"
           >
             <div className="flex justify-between items-start mb-4">
               <div 
@@ -70,7 +70,7 @@ export default function PillarsClientView({ initialPillars, coordinators }: Prop
               </div>
               <button
                 onClick={() => setEditingPillar(pillar)}
-                className="p-2 text-gray-400 hover:text-black bg-gray-50 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 text-gray-400 hover:text-black dark:hover:text-white bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                 title="Editar Pilar"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,22 +79,22 @@ export default function PillarsClientView({ initialPillars, coordinators }: Prop
               </button>
             </div>
             
-            <h3 className="font-headline text-2xl font-bold text-gray-900 mb-2">{pillar.name}</h3>
-            <p className="font-body text-sm text-gray-500 line-clamp-2 mb-6 flex-1">
+            <h3 className="font-headline text-2xl font-bold text-gray-900 dark:text-white mb-2">{pillar.name}</h3>
+            <p className="font-body text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-6 flex-1">
               {pillar.description}
             </p>
 
-            <div className="pt-4 border-t border-gray-100 mt-auto">
+            <div className="pt-4 border-t border-gray-100 dark:border-gray-700 mt-auto">
               <p className="font-body text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Coordinador</p>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-headline font-bold text-gray-600 text-xs">
+                <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-headline font-bold text-gray-600 dark:text-gray-300 text-xs">
                   {pillar.coordinator ? pillar.coordinator.name.charAt(0).toUpperCase() : "?"}
                 </div>
                 <div className="overflow-hidden">
-                  <p className="font-body font-bold text-sm text-gray-900 truncate">
+                  <p className="font-body font-bold text-sm text-gray-900 dark:text-white truncate">
                     {pillar.coordinator ? pillar.coordinator.name : "Sin Coordinador"}
                   </p>
-                  <p className="font-body text-xs text-gray-500 truncate">
+                  <p className="font-body text-xs text-gray-500 dark:text-gray-400 truncate">
                     {pillar.coordinator ? pillar.coordinator.email : "Asigna un líder"}
                   </p>
                 </div>
@@ -104,8 +104,8 @@ export default function PillarsClientView({ initialPillars, coordinators }: Prop
         ))}
 
         {filteredPillars.length === 0 && (
-          <div className="col-span-full py-20 text-center bg-white/50 rounded-3xl border border-dashed border-gray-300">
-            <p className="font-body font-medium text-gray-500 text-lg">No se encontraron pilares.</p>
+          <div className="col-span-full py-20 text-center bg-white/50 dark:bg-gray-800/50 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">
+            <p className="font-body font-medium text-gray-500 dark:text-gray-400 text-lg">No se encontraron pilares.</p>
           </div>
         )}
       </div>

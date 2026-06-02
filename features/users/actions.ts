@@ -117,3 +117,38 @@ export async function getCurrentUserAction() {
     return { success: false as const, error: "No autenticado" };
   }
 }
+
+export async function getVolunteerDashboardDataAction() {
+  try {
+    const session = await requireAuth();
+    const volunteer = await prisma.volunteer.findUnique({
+      where: { userId: session.userId }
+    });
+
+    if (!volunteer) {
+      return { success: false as const, error: "No eres un voluntario registrado" };
+    }
+
+    const tasks = await prisma.taskAssignment.findMany({
+      where: { volunteerId: volunteer.id },
+      include: {
+        task: {
+          include: { event: true }
+        }
+      },
+      orderBy: { assignedAt: "desc" }
+    });
+
+    const participations = await prisma.eventParticipation.findMany({
+      where: { volunteerId: volunteer.id },
+      include: {
+        event: true
+      },
+      orderBy: { registeredAt: "desc" }
+    });
+
+    return { success: true as const, data: { tasks, participations } };
+  } catch (error: any) {
+    return { success: false as const, error: error.message };
+  }
+}

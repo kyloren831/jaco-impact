@@ -23,9 +23,9 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="md:hidden p-4 border-b bg-white flex justify-between items-center fixed top-0 left-0 right-0 z-40 shadow-sm h-16">
+      <div className="md:hidden p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex justify-between items-center fixed top-0 left-0 right-0 z-40 shadow-sm h-16">
         <Link href="/">
-          <Image src="/letters-logo.png" alt="Jaco Impact" width={120} height={34} className="h-8 w-auto brightness-0" priority />
+          <Image src="/letters-logo.png" alt="Jaco Impact" width={120} height={34} className="h-8 w-auto brightness-0 dark:invert" priority />
         </Link>
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -38,7 +38,7 @@ export default function AdminSidebar() {
       {/* Sidebar Container */}
       <aside
         className={`
-          fixed md:sticky top-0 left-0 z-30 h-screen w-64 bg-white border-r border-gray-200 overflow-y-auto
+          fixed md:sticky top-0 left-0 z-30 h-screen w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto
           transition-transform duration-300 ease-in-out pt-16 md:pt-0
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
@@ -46,7 +46,7 @@ export default function AdminSidebar() {
         <div className="p-6">
           <div className="mb-8 hidden md:block">
             <Link href="/">
-              <Image src="/letters-logo.png" alt="Jaco Impact" width={160} height={46} className="h-10 w-auto brightness-0" priority />
+              <Image src="/letters-logo.png" alt="Jaco Impact" width={160} height={46} className="h-10 w-auto brightness-0 dark:invert" priority />
             </Link>
           </div>
           <nav className="space-y-1.5">
@@ -63,11 +63,11 @@ export default function AdminSidebar() {
                     flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200
                     ${isActive
                       ? "bg-brand-verde/10 text-brand-verde"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
                     }
                   `}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? "text-brand-verde" : "text-gray-400"}`} />
+                  <Icon className={`w-5 h-5 ${isActive ? "text-brand-verde" : "text-gray-400 dark:text-gray-500"}`} />
                   {item.name}
                 </Link>
               );

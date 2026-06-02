@@ -5,7 +5,7 @@ import type { CreateProjectDTO } from "@/lib/validators/project.validator";
 export type ProjectResponse = {
   id: number;
   pillarId: number;
-  createdBY: number;
+  createdBy: number;
   name: string;
   description: string;
   objectives: string | null;
@@ -22,15 +22,15 @@ export type ProjectResponse = {
 export class ProjectMapper {
   /**
    * DTO de creación → datos para Prisma (excluye campos auto-generados).
-   * Requiere el ID del usuario autenticado para asignar createdBY.
+   * Requiere el ID del usuario autenticado para asignar createdBy.
    */
   static toEntity(
     dto: CreateProjectDTO,
-    createdBY: number
-  ): Omit<Project, "id" | "createdAt"> {
+    createdBy: number
+  ): Omit<Project, "id" | "createdAt" | "updatedAt"> {
     return {
       pillarId: dto.pillarId,
-      createdBY,
+      createdBy,
       name: dto.name,
       description: dto.description,
       objectives: dto.objectives ?? null,
@@ -50,7 +50,7 @@ export class ProjectMapper {
     return {
       id: project.id,
       pillarId: project.pillarId,
-      createdBY: project.createdBY,
+      createdBy: project.createdBy,
       name: project.name,
       description: project.description,
       objectives: project.objectives,

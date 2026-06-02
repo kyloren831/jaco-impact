@@ -9,7 +9,7 @@ export type UserResponse = {
 };
 
 export class UserMapper{
-    static toEntity (userDto : CreateUserDTO) : Omit<User,'id' | 'createdAt'> {
+    static toEntity (userDto : CreateUserDTO) : Omit<User,'id' | 'createdAt' | 'updatedAt'> {
         return {
             name:userDto.name,
             email:userDto.email,

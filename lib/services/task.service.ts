@@ -9,7 +9,7 @@ export class TaskService {
         creator: {
           select: { name: true, email: true }
         },
-        assignedTo: {
+        assignments: {
           include: {
             volunteer: {
               include: { user: { select: { name: true, email: true } } }
@@ -37,13 +37,7 @@ export class TaskService {
         priority: data.priority,
         taskStatus: data.taskStatus || "OPEN",
         dueDate: data.dueDate || null,
-        createdBY: userId,
-        assignedTo: data.volunteerIds && data.volunteerIds.length > 0 ? {
-          create: data.volunteerIds.map(volunteerId => ({
-            volunteerId,
-            status: "ASSIGNED"
-          }))
-        } : undefined
+        createdBy: userId,
       }
     });
   }
@@ -56,28 +50,29 @@ export class TaskService {
   }
 
   async assignVolunteerToTask(taskId: number, volunteerId: number) {
-    return prisma.taskVolunteer.upsert({
-      where: {
-        taskId_volunteerId: {
-          taskId,
-          volunteerId
-        }
-      },
-      update: {}, // Si ya existe, no hace nada o actualiza fecha
-      create: {
-        taskId,
-        volunteerId,
-        status: "ASSIGNED"
-      }
-    });
+    // Deprecated. Handled by AssignmentService.
+    return null;
   }
 
   async removeVolunteerFromTask(taskId: number, volunteerId: number) {
-    return prisma.taskVolunteer.delete({
-      where: {
-        taskId_volunteerId: {
-          taskId,
-          volunteerId
+    // Deprecated. Handled by AssignmentService.
+    return null;
+  }
+
+  async updateTaskDetails(taskId: number, data: { title?: string; description?: string | null }) {
+    return prisma.task.update({
+      where: { id: taskId },
+      data,
+      include: {
+        creator: {
+          select: { name: true, email: true }
+        },
+        assignments: {
+          include: {
+            volunteer: {
+              include: { user: { select: { name: true, email: true } } }
+            }
+          }
         }
       }
     });
