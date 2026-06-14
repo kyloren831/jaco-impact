@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 type RealtimeEvent<T = any> = {
   type: string;
@@ -8,9 +8,14 @@ type RealtimeEvent<T = any> = {
   payload: T;
 };
 
-export function useRealtime<T = any>(eventType?: string) {
+export function useRealtime<T = any>(
+  eventType?: string,
+  onEvent?: (event: RealtimeEvent<T>) => void
+) {
   const [lastEvent, setLastEvent] = useState<RealtimeEvent<T> | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const callbackRef = useRef(onEvent);
+  callbackRef.current = onEvent;
 
   useEffect(() => {
     const eventSource = new EventSource('/api/realtime');
@@ -30,6 +35,9 @@ export function useRealtime<T = any>(eventType?: string) {
         
         if (!eventType || parsedEvent.type === eventType) {
           setLastEvent(parsedEvent);
+          if (callbackRef.current) {
+            callbackRef.current(parsedEvent);
+          }
         }
       } catch (err) {
         console.error('Failed to parse realtime event data:', err);

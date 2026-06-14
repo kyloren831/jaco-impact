@@ -1,7 +1,7 @@
 import { IEventRepository } from './event.repository';
 import { EventPrismaRepository } from '../../infrastructure/prisma/repositories/event.prisma-repository';
 import { CreateEventDTO, UpdateEventDTO } from './event.types';
-import { EventStatus } from '../../generated/prisma/client';
+import { EventStatus, AssignmentStatus } from '../../generated/prisma/client';
 import { eventStateMachine } from './event.state-machine';
 import { EventNotFoundError } from './event.errors';
 import { domainEventBus } from '../shared/domain-event-bus';
@@ -55,6 +55,42 @@ export class EventDomainService {
 
       // Update status
       const updatedEvent = await (this.repository as EventPrismaRepository).updateStatus(id, newStatus, tx);
+
+      // If cancelled, cascade to task assignments
+      if (newStatus === EventStatus.CANCELLED) {
+        const assignments = await tx.taskAssignment.findMany({
+          where: {
+            eventId: id,
+            status: { notIn: [AssignmentStatus.CANCELLED, AssignmentStatus.DECLINED] }
+          }
+        });
+
+        if (assignments.length > 0) {
+          await tx.taskAssignment.updateMany({
+            where: {
+              eventId: id,
+              status: { notIn: [AssignmentStatus.CANCELLED, AssignmentStatus.DECLINED] }
+            },
+            data: { status: AssignmentStatus.CANCELLED }
+          });
+
+          // Emit ASSIGNMENT_CANCELLED for each
+          for (const assignment of assignments) {
+            await domainEventBus.emit({
+              metadata: { timestamp: new Date(), actorId },
+              type: DOMAIN_EVENTS.ASSIGNMENT_CANCELLED,
+              payload: {
+                taskId: assignment.taskId,
+                volunteerId: assignment.volunteerId,
+                eventId: id,
+                actorId,
+                previousStatus: assignment.status,
+                newStatus: AssignmentStatus.CANCELLED
+              }
+            });
+          }
+        }
+      }
 
       // Emit EVENT_STATUS_CHANGED
       await domainEventBus.emit({

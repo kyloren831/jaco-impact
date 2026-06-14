@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-const navItems = [
+const adminNavItems = [
   { name: "Dashboard", href: "/dashboard/admin", icon: DashboardIcon },
   { name: "Usuarios", href: "/dashboard/admin/users", icon: UsersIcon },
   { name: "Pilares", href: "/dashboard/admin/pillars", icon: LayersIcon },
@@ -16,9 +16,47 @@ const navItems = [
   { name: "Pymes y Productos", href: "/dashboard/admin/pymes", icon: StoreIcon },
 ];
 
-export default function AdminSidebar() {
+const volunteerNavItems = [
+  { name: "Dashboard", href: "/dashboard/volunteer", icon: DashboardIcon },
+  { name: "Proyectos", href: "/dashboard/volunteer/projects", icon: CalendarIcon },
+  { name: "Eventos", href: "/dashboard/volunteer/events", icon: CheckCircleIcon },
+  { name: "Mis Tareas", href: "/dashboard/volunteer/tasks", icon: CheckCircleIcon },
+];
+
+interface DashboardSidebarProps {
+  roles?: string[];
+}
+
+export default function DashboardSidebar({ roles = ["VOLUNTEER"] }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Determinar qué elementos mostrar
+  let navItems: { name: string; href: string; icon: any }[] = [];
+  
+  // Base dashboard for everyone
+  navItems.push({ name: "Dashboard Base", href: "/dashboard", icon: DashboardIcon });
+
+  if (roles.includes("VOLUNTEER") || roles.includes("USER")) {
+    navItems.push(...volunteerNavItems.filter(item => item.name !== "Dashboard"));
+  }
+
+  if (roles.includes("COORDINATOR")) {
+    // Coordinators can manage their pillar's specific stuff. 
+    // They share some admin routes or have their own.
+    navItems.push(
+      { name: "Proyectos (Gestión)", href: "/dashboard/admin/projects", icon: CalendarIcon },
+      { name: "Eventos (Gestión)", href: "/dashboard/admin/events", icon: CheckCircleIcon },
+      { name: "Voluntarios (Gestión)", href: "/dashboard/admin/volunteers", icon: HeartIcon }
+    );
+  }
+
+  if (roles.includes("ADMIN")) {
+    // Admins see everything
+    // Evitar duplicados si también es coordinador
+    const adminUnique = adminNavItems.filter(item => item.name !== "Dashboard" && !navItems.some(existing => existing.href === item.href));
+    navItems.push(...adminUnique);
+  }
 
   return (
     <>
@@ -115,3 +153,4 @@ function MenuIcon(props: React.SVGProps<SVGSVGElement>) {
 function LayersIcon(props: React.SVGProps<SVGSVGElement>) {
   return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 11l-7 4-7-4m14-3l-7 4-7-4m14 6l-7 4-7-4m7-10l-7 4-7-4 7-4 7 4z" /></svg>;
 }
+

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth/guards";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export const metadata = {
   title: "Admin Dashboard - Jacó Impact",
@@ -22,17 +21,5 @@ export default async function AdminLayout({
     redirect("/dashboard"); 
   }
 
-  return (
-    <div className="flex flex-1">
-      {/* Sidebar Navigation */}
-      <AdminSidebar />
-
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-x-hidden p-4 pt-14 md:p-8 md:pt-[100px]">
-        <div className="mx-auto max-w-7xl">
-          {children}
-        </div>
-      </main>
-    </div>
-  );
+  return <>{children}</>;
 }

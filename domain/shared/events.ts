@@ -59,8 +59,21 @@ export type NotificationCreatedPayload = {
   title: string;
 };
 
+export type TaskCommentPayload = {
+  taskId: number;
+  commentId: number;
+  authorId: number;
+  content: string;
+  createdAt: Date;
+  authorName: string;
+  eventId: number;
+};
+
 // ── Event Type Registry ──
 export const DOMAIN_EVENTS = {
+  // Comment domain
+  TASK_COMMENT: 'TASK_COMMENT',
+
   // Events domain
   EVENT_CREATED: 'EVENT_CREATED',
   EVENT_STATUS_CHANGED: 'EVENT_STATUS_CHANGED',
@@ -83,6 +96,7 @@ export const DOMAIN_EVENTS = {
   ASSIGNMENT_REVISION_REQUESTED: 'ASSIGNMENT_REVISION_REQUESTED',
   ASSIGNMENT_CANCELLED: 'ASSIGNMENT_CANCELLED',
   TASK_STATUS_DERIVED: 'TASK_STATUS_DERIVED',
+  ASSIGNMENT_STATUS_CHANGED: 'ASSIGNMENT_STATUS_CHANGED',
 
   // Evidence domain
   EVIDENCE_SUBMITTED: 'EVIDENCE_SUBMITTED',

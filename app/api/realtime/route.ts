@@ -11,7 +11,35 @@ export async function GET(req: NextRequest) {
       
       const sendEvent = (event: any) => {
         try {
-          const data = `data: ${JSON.stringify(event)}\n\n`;
+          let outputEvent = event;
+          if (event.type === DOMAIN_EVENTS.TASK_COMMENT) {
+            outputEvent = {
+              ...event,
+              payload: {
+                ...event.payload,
+                comment: {
+                  id: event.payload.commentId,
+                  content: event.payload.content,
+                  createdAt: event.payload.createdAt,
+                  author: {
+                    id: event.payload.authorId,
+                    name: event.payload.authorName,
+                  },
+                },
+              },
+            };
+          } else if (event.type === DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED) {
+            outputEvent = {
+              ...event,
+              payload: {
+                ...event.payload,
+                taskId: event.payload.taskId,
+                volunteerId: event.payload.volunteerId,
+                newStatus: event.payload.newStatus,
+              },
+            };
+          }
+          const data = `data: ${JSON.stringify(outputEvent)}\n\n`;
           controller.enqueue(encoder.encode(data));
         } catch (e) {
           // Ignore write errors (e.g. client disconnected)

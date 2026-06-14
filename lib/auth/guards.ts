@@ -85,3 +85,33 @@ export function withRole<T, Args extends any[]>(
     return action(payload, ...args);
   };
 }
+
+// ── Require pillar access ──────────────────────────────────────────
+/**
+ * Valida que el usuario tenga acceso al pilar especificado (Admin global o Coordinador de ese pilar).
+ */
+export async function requirePillarAccess(pillarId: number): Promise<AccessTokenPayload> {
+  const payload = await requireAuth();
+  const userRoles = payload.roles ?? [payload.role];
+
+  if (userRoles.includes("ADMIN")) {
+    return payload; // Admin tiene acceso global
+  }
+
+  if (userRoles.includes("COORDINATOR") && payload.pillarId === pillarId) {
+    return payload; // Coordinador tiene acceso a su propio pilar
+  }
+
+  throw new AuthError("FORBIDDEN", "No tienes permisos para gestionar recursos de este pilar");
+}
+
+export function withPillarAccess<T, Args extends any[]>(
+  getPillarId: (...args: Args) => number,
+  action: (payload: AccessTokenPayload, ...args: Args) => Promise<T>
+) {
+  return async (...args: Args): Promise<T> => {
+    const pillarId = getPillarId(...args);
+    const payload = await requirePillarAccess(pillarId);
+    return action(payload, ...args);
+  };
+}

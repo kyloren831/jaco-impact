@@ -2,7 +2,7 @@ import { z } from "zod"
 
 export const CreateUserSchema = z.object({
   name:     z.string().min(1, "El nombre es requerido").max(100),
-  email:    z.string().email("Email inválido").max(150),
+  email:    z.string().email("Email inválido").max(150).trim().toLowerCase(),
   password: z.string().min(8, "Mínimo 8 caracteres").max(255),
   isActive: z.boolean().default(true),
 })
@@ -19,7 +19,7 @@ export type UpdateUserDTO     = z.infer<typeof UpdateUserSchema>
 export type AssignRoleDTO     = z.infer<typeof AssignRoleSchema>
 
 export const LoginUserSchema = z.object({
-  email: z.string().email("Email inválido"),
+  email: z.string().email("Email inválido").trim().toLowerCase(),
   password: z.string().min(1, "El password es requerido"),
 })
 export type LoginUserDTO      = z.infer<typeof LoginUserSchema>

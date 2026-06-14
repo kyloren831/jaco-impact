@@ -26,7 +26,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     // ── Buscar usuario con roles ────────────────────────────────
     const user = await prisma.user.findUnique({
       where: { email: result.data.email },
-      include: { userRoles: true },
+      include: { userRoles: true, pillar: true },
     });
 
     if (!user) {
@@ -55,6 +55,7 @@ export async function loginAction(prevState: any, formData: FormData) {
       email: user.email,
       role: primaryRole,
       roles,
+      pillarId: user.pillar?.id,
     });
 
     const refreshToken = await signRefreshToken({
@@ -84,9 +85,5 @@ export async function loginAction(prevState: any, formData: FormData) {
 
   // Next.js requires redirect() to be called OUTSIDE of try/catch blocks
   // because it throws a specific error to halt execution and perform the redirect.
-  if (primaryRole === "ADMIN") {
-    redirect("/dashboard/admin");
-  } else {
-    redirect("/dashboard");
-  }
+  redirect("/dashboard");
 }

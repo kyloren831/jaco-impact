@@ -7,6 +7,7 @@ export interface AccessTokenPayload extends JWTPayload {
   email: string;
   role: string;      // rol principal
   roles: string[];   // todos los roles
+  pillarId?: number; // id del pilar si es coordinador
 }
 
 export interface RefreshTokenPayload extends JWTPayload {
@@ -31,12 +32,14 @@ export async function signAccessToken(payload: {
   email: string;
   role: string;
   roles: string[];
+  pillarId?: number;
 }): Promise<string> {
   return new SignJWT({
     userId: payload.sub,
     email: payload.email,
     role: payload.role,
     roles: payload.roles,
+    pillarId: payload.pillarId,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(payload.sub))

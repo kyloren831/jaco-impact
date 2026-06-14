@@ -1,5 +1,6 @@
 import "server-only";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // Ensure environment variables exist
 const accountId = process.env.R2_ACCOUNT_ID;
@@ -28,6 +29,13 @@ const s3Client = new S3Client({
  * @returns The public URL of the uploaded image
  */
 export async function uploadFileToR2(file: File, folder: string): Promise<string> {
+  if (process.env.NODE_ENV === "test" || process.env.MOCK_S3 === "true") {
+    const extension = file.name.split('.').pop() || 'png';
+    const uniqueName = `${crypto.randomUUID()}-${Date.now()}.${extension}`;
+    const cleanPublicUrl = (publicUrl || 'http://localhost:3005').replace(/\/$/, '');
+    return `${cleanPublicUrl}/${folder}/${uniqueName}`;
+  }
+
   if (!bucketName || !publicUrl) {
     throw new Error("Storage configuration is missing. Verifica R2_BUCKET_NAME y NEXT_PUBLIC_R2_DEV_URL en .env.local");
   }
@@ -55,4 +63,51 @@ export async function uploadFileToR2(file: File, folder: string): Promise<string
   // Return the full public URL
   const cleanPublicUrl = publicUrl.replace(/\/$/, '');
   return `${cleanPublicUrl}/${key}`;
+}
+
+/**
+ * Generates a presigned upload URL and public file URL for S3/R2 storage
+ * @param fileName Name of the file (e.g., 'image.png')
+ * @param fileType MIME type of the file (e.g., 'image/png')
+ * @param folder Optional folder name (defaults to 'evidences')
+ */
+export async function getPresignedUploadUrl(
+  fileName: string,
+  fileType: string,
+  folder?: string
+): Promise<{ uploadUrl: string; fileUrl: string }> {
+  const cleanFolder = (folder || "evidences").replace(/^\/|\/$/g, "");
+  const lastDotIndex = fileName.lastIndexOf(".");
+  const rawExtension = lastDotIndex !== -1 ? fileName.slice(lastDotIndex + 1) : "";
+  const extension = rawExtension.replace(/[^a-zA-Z0-9]/g, ""); // Allow only alphanumeric characters
+  const uniqueName = extension
+    ? `${crypto.randomUUID()}-${Date.now()}.${extension}`
+    : `${crypto.randomUUID()}-${Date.now()}`;
+  const key = `${cleanFolder}/${uniqueName}`;
+
+  const cleanPublicUrl = (process.env.NEXT_PUBLIC_R2_DEV_URL || "http://localhost:3005").replace(/\/$/, "");
+
+  if (process.env.NODE_ENV === "test" || process.env.MOCK_S3 === "true") {
+    return {
+      fileUrl: `${cleanPublicUrl}/${key}`,
+      uploadUrl: `${cleanPublicUrl}/mock-upload/${key}`,
+    };
+  }
+
+  if (!bucketName || !publicUrl) {
+    throw new Error("Storage configuration is missing. Verifica R2_BUCKET_NAME y NEXT_PUBLIC_R2_DEV_URL en .env.local");
+  }
+
+  const command = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+    ContentType: fileType,
+  });
+
+  const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+
+  return {
+    uploadUrl,
+    fileUrl: `${cleanPublicUrl}/${key}`,
+  };
 }

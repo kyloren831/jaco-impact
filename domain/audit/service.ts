@@ -24,6 +24,8 @@ const auditMapping: Record<string, { action: ActivityAction, entityType: string 
   [DOMAIN_EVENTS.ASSIGNMENT_CANCELLED]: { action: 'CANCELLED', entityType: 'Assignment' },
   [DOMAIN_EVENTS.TASK_STATUS_DERIVED]: { action: 'STATUS_CHANGED', entityType: 'Task' },
 
+  [DOMAIN_EVENTS.TASK_COMMENT]: { action: 'CREATED', entityType: 'Comment' },
+
   [DOMAIN_EVENTS.EVIDENCE_SUBMITTED]: { action: 'SUBMITTED', entityType: 'Evidence' },
   [DOMAIN_EVENTS.EVIDENCE_APPROVED]: { action: 'REVIEWED', entityType: 'Evidence' },
   [DOMAIN_EVENTS.EVIDENCE_REJECTED]: { action: 'REVIEWED', entityType: 'Evidence' },
@@ -35,6 +37,7 @@ function extractEntityId(payload: any, entityType: string): number {
   if (entityType === 'Assignment' && payload.taskId) return payload.taskId;
   if (entityType === 'Evidence' && payload.evidenceId) return payload.evidenceId;
   if (entityType === 'Participation' && payload.eventId) return payload.eventId;
+  if (entityType === 'Comment' && payload.commentId) return payload.commentId;
   
   return payload.id || payload.eventId || payload.taskId || 0;
 }
