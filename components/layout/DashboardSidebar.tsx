@@ -41,6 +41,10 @@ export default function DashboardSidebar({ roles = ["VOLUNTEER"] }: DashboardSid
     navItems.push(...volunteerNavItems.filter(item => item.name !== "Dashboard"));
   }
 
+  if (roles.includes("PYME_MANAGER")) {
+    navItems.push({ name: "Mi Emprendimiento", href: "/dashboard/pyme", icon: StoreIcon });
+  }
+
   if (roles.includes("COORDINATOR")) {
     // Coordinators can manage their pillar's specific stuff. 
     // They share some admin routes or have their own.
@@ -94,7 +98,7 @@ export default function DashboardSidebar({ roles = ["VOLUNTEER"] }: DashboardSid
 
               return (
                 <Link
-                  key={item.name}
+                  key={item.href}
                   href={item.href}
                   onClick={() => setIsMobileOpen(false)}
                   className={`

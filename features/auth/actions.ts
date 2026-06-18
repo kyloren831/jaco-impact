@@ -7,8 +7,10 @@ import { hashToken } from "@/lib/auth/hash";
 import { setAuthCookies } from "@/lib/auth/cookies";
 import { createSession } from "@/lib/auth/session";
 import { LoginUserSchema } from "@/lib/validators";
+import crypto from "crypto";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth/guards";
 
 export async function loginAction(prevState: any, formData: FormData) {
   let primaryRole = "VOLUNTEER";
@@ -86,4 +88,165 @@ export async function loginAction(prevState: any, formData: FormData) {
   // Next.js requires redirect() to be called OUTSIDE of try/catch blocks
   // because it throws a specific error to halt execution and perform the redirect.
   redirect("/dashboard");
+}
+
+export async function registerAction(prevState: any, formData: FormData) {
+  try {
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const phone = formData.get("phone") as string;
+    const nationality = formData.get("nationality") as string;
+
+    if (!name || !email || !password || !phone || !nationality) {
+      return { success: false, error: "Faltan campos requeridos" };
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return { success: false, error: "El correo ya está registrado" };
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          isActive: true,
+        },
+      });
+
+      await tx.userRole.create({
+        data: {
+          userId: user.id,
+          role: "VOLUNTEER",
+        },
+      });
+
+      await tx.volunteer.create({
+        data: {
+          userId: user.id,
+          phone,
+          nationality,
+          profession: (formData.get("profession") as string) || "No especificado",
+          emergencyContactName: (formData.get("emergencyContactName") as string) || "No especificado",
+          emergencyContactPhone: (formData.get("emergencyContactPhone") as string) || "No especificado",
+          inmediateAvailability: formData.get("inmediateAvailability") === "true",
+        },
+      });
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("[REGISTER ERROR]", error);
+    return { success: false, error: "Error interno del servidor" };
+  }
+}
+
+export async function changePasswordAction(prevState: any, formData: FormData) {
+  try {
+    const payload = await requireAuth();
+    const oldPassword = formData.get("oldPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+
+    if (!oldPassword || !newPassword) {
+      return { success: false, error: "Faltan campos requeridos" };
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: Number(payload.sub) } });
+    if (!user) {
+      return { success: false, error: "Usuario no encontrado" };
+    }
+
+    const passwordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!passwordValid) {
+      return { success: false, error: "La contraseña actual es incorrecta" };
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("[CHANGE PASSWORD ERROR]", error);
+    return { success: false, error: "Error interno del servidor" };
+  }
+}
+
+export async function forgotPasswordAction(prevState: any, formData: FormData) {
+  try {
+    const email = formData.get("email") as string;
+    if (!email) {
+      return { success: false, error: "Faltan campos requeridos" };
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+      const token = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          token,
+          expiresAt,
+        },
+      });
+
+      console.log(`[MOCK EMAIL] Enlace de recuperación de contraseña para ${email}: /reset-password?token=${token}`);
+    }
+
+    return { success: true, message: "Si el correo existe, te hemos enviado un enlace" };
+  } catch (error) {
+    console.error("[FORGOT PASSWORD ERROR]", error);
+    return { success: false, error: "Error interno del servidor" };
+  }
+}
+
+export async function resetPasswordAction(prevState: any, formData: FormData) {
+  try {
+    const token = formData.get("token") as string;
+    const newPassword = formData.get("newPassword") as string;
+
+    if (!token || !newPassword) {
+      return { success: false, error: "Faltan campos requeridos" };
+    }
+
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token },
+    });
+
+    if (!resetToken) {
+      return { success: false, error: "Token inválido o expirado" };
+    }
+
+    if (resetToken.expiresAt < new Date()) {
+      await prisma.passwordResetToken.delete({ where: { id: resetToken.id } });
+      return { success: false, error: "Token expirado" };
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: resetToken.userId },
+        data: { password: hashedPassword },
+      });
+
+      await tx.passwordResetToken.delete({
+        where: { id: resetToken.id },
+      });
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("[RESET PASSWORD ERROR]", error);
+    return { success: false, error: "Error interno del servidor" };
+  }
 }

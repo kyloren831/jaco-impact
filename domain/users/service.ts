@@ -1,6 +1,6 @@
 import { IUserRepository } from "./user.repository";
 import { UserPrismaRepository } from "@/infrastructure/prisma/repositories/user.prisma-repository";
-import { CreateUserCommand, AssignRoleCommand } from "./user.types";
+import { CreateUserCommand, AssignRoleCommand, UpdateProfileCommand } from "./user.types";
 import { UserEmailAlreadyExistsError, UserNotFoundError, UserRoleNotAssignedError } from "./user.errors";
 import { withTransaction } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -66,6 +66,19 @@ export class UserDomainService {
     
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  async updateProfile(data: UpdateProfileCommand) {
+    return withTransaction(async (tx) => {
+      const user = await this.repository.findById(data.userId, tx);
+      if (!user) {
+        throw new UserNotFoundError();
+      }
+
+      const updated = await this.repository.updateProfile(data, tx);
+      const { password: _, ...userWithoutPassword } = updated;
+      return userWithoutPassword;
+    });
   }
 }
 

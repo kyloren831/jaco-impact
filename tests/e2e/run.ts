@@ -6,7 +6,7 @@ import fs from "fs";
 
 async function main() {
   console.log("=== STARTING E2E TEST SUITE ORCHESTRATION ===");
-  process.env.NODE_ENV = "test";
+  (process.env as any).NODE_ENV = "test";
   process.env.MOCK_S3 = "true";
 
   let devServer: DevServerManager | null = null;

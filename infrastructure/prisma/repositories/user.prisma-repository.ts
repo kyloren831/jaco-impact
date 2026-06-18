@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { IUserRepository } from "@/domain/users/user.repository";
-import type { CreateUserCommand, Role } from "@/domain/users/user.types";
+import type { CreateUserCommand, UpdateProfileCommand, Role } from "@/domain/users/user.types";
 import { Prisma } from "@/generated/prisma/client";
 
 export class UserPrismaRepository implements IUserRepository {
@@ -8,8 +8,42 @@ export class UserPrismaRepository implements IUserRepository {
     const client = tx || prisma;
     return client.user.findUnique({
       where: { id },
-      include: { userRoles: true },
+      include: { userRoles: true, volunteers: true },
     });
+  }
+
+  async updateProfile(data: UpdateProfileCommand, tx?: Prisma.TransactionClient) {
+    const client = tx || prisma;
+    
+    // Update basic user fields
+    if (data.name !== undefined || data.imageUrl !== undefined) {
+      await client.user.update({
+        where: { id: data.userId },
+        data: {
+          ...(data.name !== undefined && { name: data.name }),
+          ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
+        },
+      });
+    }
+
+    // Update volunteer data if provided
+    if (data.volunteerData) {
+      await client.volunteer.upsert({
+        where: { userId: data.userId },
+        update: data.volunteerData,
+        create: {
+          userId: data.userId,
+          phone: data.volunteerData.phone || "",
+          nationality: data.volunteerData.nationality || "",
+          profession: data.volunteerData.profession || "",
+          emergencyContactName: data.volunteerData.emergencyContactName || "",
+          emergencyContactPhone: data.volunteerData.emergencyContactPhone || "",
+          inmediateAvailability: data.volunteerData.inmediateAvailability || false,
+        },
+      });
+    }
+
+    return this.findById(data.userId, tx);
   }
 
   async findByEmail(email: string, tx?: Prisma.TransactionClient) {

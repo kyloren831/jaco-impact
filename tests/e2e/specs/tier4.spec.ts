@@ -269,7 +269,7 @@ describe("Tier 4 E2E Test Suite - Real-World Application Workloads", () => {
 
     const evs = await prisma.taskEvidence.findMany({
       where: { taskId: cycleTask.id, volunteerId: seed.volunteer1.id },
-      orderBy: { createdAt: "asc" },
+      orderBy: { uploadedAt: "asc" },
     });
 
     assert.strictEqual(evs.length, 3);
