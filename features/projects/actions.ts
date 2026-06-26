@@ -21,8 +21,15 @@ export async function createProject(formData: FormData) {
   const startDateStr = formData.get("startDate") as string;
   const endDateStr = formData.get("endDate") as string;
 
-  if (!name || !description || !pillarId || !status || !visibility) {
-    return { success: false, error: "Faltan datos obligatorios." };
+  if (!name || !description || !pillarId || !status || !visibility || !startDateStr || !endDateStr) {
+    return { success: false, error: "Faltan datos obligatorios, incluyendo fechas." };
+  }
+
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+
+  if (startDate >= endDate) {
+    return { success: false, error: "La fecha de inicio debe ser anterior a la de finalización." };
   }
 
   // Si no es ADMIN, la validación de pertenencia se hace en el controlador por ahora, o dejamos que falle en creación
@@ -43,8 +50,6 @@ export async function createProject(formData: FormData) {
   }
 
   try {
-    const startDate = startDateStr ? new Date(startDateStr) : null;
-    const endDate = endDateStr ? new Date(endDateStr) : null;
     let publishedAt = null;
     
     if (status === "PUBLISHED" || status === "IN_PROGRESS") {
@@ -133,6 +138,12 @@ export async function updateProject(id: number, formData: FormData) {
     if (status) dataToUpdate.status = status;
     if (visibility) dataToUpdate.visibility = visibility;
     
+    if (startDateStr && endDateStr) {
+      if (new Date(startDateStr) >= new Date(endDateStr)) {
+        return { success: false, error: "La fecha de inicio debe ser anterior a la de finalización." };
+      }
+    }
+
     if (startDateStr) {
       dataToUpdate.startDate = new Date(startDateStr);
     } else if (startDateStr === "") {

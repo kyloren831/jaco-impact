@@ -46,7 +46,7 @@ export async function updateProfileAction(data: any) {
       userId: session.userId,
       name: data.name,
       imageUrl: data.imageUrl,
-      volunteerData: data.volunteer,
+      volunteerData: data.volunteerData || data.volunteer,
     });
 
     revalidatePath("/dashboard/profile");

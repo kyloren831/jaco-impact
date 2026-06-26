@@ -69,7 +69,7 @@ export async function getMyPymeAction() {
     },
   });
   
-  return pymeManager;
+  return pymeManager?.pyme || null;
 }
 
 type UpsertPymeData = {

@@ -194,7 +194,7 @@ export default function PymeDashboardPage() {
           <div className="col-span-1 md:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm h-full">
               <div className="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-gray-700 pb-2">
-                <h2 className="text-lg font-semibold">Productos ({pyme.products.length})</h2>
+                <h2 className="text-lg font-semibold">Productos ({(pyme.products || []).length})</h2>
                 <button
                   onClick={() => setIsAddingProduct(true)}
                   className="flex items-center gap-1.5 text-sm font-medium text-brand-verde hover:text-brand-verde/80 transition-colors"
@@ -203,7 +203,7 @@ export default function PymeDashboardPage() {
                 </button>
               </div>
 
-              {pyme.products.length === 0 ? (
+              {!(pyme.products && pyme.products.length > 0) ? (
                 <div className="text-center py-12 px-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
                   <ImageIcon className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
                   <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Sin productos</h3>

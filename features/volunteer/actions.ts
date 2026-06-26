@@ -176,6 +176,7 @@ export async function acceptAssignmentAction(taskId: number) {
 
     revalidatePath("/dashboard/volunteer/tasks");
     revalidatePath("/dashboard/volunteer");
+    revalidatePath(`/dashboard/admin/events/${result.eventId}`);
     return { success: true as const, data: result };
   } catch (error: any) {
     return { success: false as const, error: error.message };
@@ -193,6 +194,7 @@ export async function declineAssignmentAction(taskId: number, reason: string) {
 
     revalidatePath("/dashboard/volunteer/tasks");
     revalidatePath("/dashboard/volunteer");
+    revalidatePath(`/dashboard/admin/events/${result.eventId}`);
     return { success: true as const, data: result };
   } catch (error: any) {
     return { success: false as const, error: error.message };
@@ -210,6 +212,7 @@ export async function startAssignmentAction(taskId: number) {
 
     revalidatePath("/dashboard/volunteer/tasks");
     revalidatePath("/dashboard/volunteer");
+    revalidatePath(`/dashboard/admin/events/${result.eventId}`);
     return { success: true as const, data: result };
   } catch (error: any) {
     return { success: false as const, error: error.message };
@@ -227,6 +230,7 @@ export async function submitAssignmentAction(taskId: number, note?: string) {
 
     revalidatePath("/dashboard/volunteer/tasks");
     revalidatePath("/dashboard/volunteer");
+    revalidatePath(`/dashboard/admin/events/${result.eventId}`);
     return { success: true as const, data: result };
   } catch (error: any) {
     return { success: false as const, error: error.message };

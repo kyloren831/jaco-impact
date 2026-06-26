@@ -42,7 +42,8 @@ export const createEvent = withRole(['ADMIN', 'COORDINATOR'], async (payload, fo
     const description = formData.get("description") as string;
     const location = formData.get("location") as string;
     const eventDateStr = formData.get("eventDate") as string;
-    const volunteersNeeded = Number(formData.get("volunteersNeeded")) || 0;
+    const volunteersNeededStr = formData.get("volunteersNeeded");
+    const volunteersNeeded = Number(volunteersNeededStr);
     const visibility = (formData.get("visibility") as any) || Visibility.PUBLIC;
     const startDateStr = formData.get("startDate") as string;
     const endDateStr = formData.get("endDate") as string;
@@ -51,11 +52,22 @@ export const createEvent = withRole(['ADMIN', 'COORDINATOR'], async (payload, fo
       return { success: false, error: "Faltan campos obligatorios" };
     }
 
+    if (!volunteersNeededStr || volunteersNeeded <= 0) {
+      return { success: false, error: "Debes especificar la cantidad de voluntarios necesarios (mayor a 0)." };
+    }
+
+    const eventDate = new Date(eventDateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Ignore time part for today
+    if (eventDate < today) {
+      return { success: false, error: "La fecha del evento no puede ser en el pasado." };
+    }
+
     const data: CreateEventDTO = {
       name,
       description: description || null,
       location: location || null,
-      eventDate: new Date(eventDateStr),
+      eventDate,
       volunteersNeeded,
       visibility,
       startDate: startDateStr ? new Date(startDateStr) : null,

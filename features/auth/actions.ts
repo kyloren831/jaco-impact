@@ -102,6 +102,11 @@ export async function registerAction(prevState: any, formData: FormData) {
       return { success: false, error: "Faltan campos requeridos" };
     }
 
+    const phoneRegex = /^\+?[0-9\s\-\(\)]{8,}$/;
+    if (!phoneRegex.test(phone)) {
+      return { success: false, error: "El teléfono no tiene un formato válido" };
+    }
+
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return { success: false, error: "El correo ya está registrado" };

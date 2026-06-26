@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import styles from "./register.module.css";
 import { registerAction } from "@/features/auth/actions";
 
@@ -11,7 +12,17 @@ const registerActionWrapper = async (prevState: any, formData: FormData) => {
 };
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(registerActionWrapper, null);
+
+  useEffect(() => {
+    if (state?.success) {
+      const timer = setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [state?.success, router]);
 
   return (
     <div className={styles.registerPage}>
