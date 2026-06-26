@@ -23,6 +23,24 @@ export default async function Home() {
     }
   });
 
+  const activeProjects = await prisma.project.findMany({
+    where: { 
+      status: { in: ['PUBLISHED', 'IN_PROGRESS'] },
+      visibility: 'PUBLIC'
+    },
+    include: {
+      pillar: true,
+      events: {
+        where: {
+          status: { in: ['PLANNED', 'OPEN'] },
+          visibility: 'PUBLIC'
+        },
+        orderBy: { eventDate: 'asc' }
+      }
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -31,7 +49,7 @@ export default async function Home() {
       <AboutSection />
       <ImpactStatsSection stats={impactStatsData} />
       <PilaresSection pilares={dbPillars} />
-      <GaleriaSection actividades={actividadesData} />
+      <GaleriaSection proyectos={activeProjects} pilares={dbPillars} />
       <CtaSection />
 
       <Footer />

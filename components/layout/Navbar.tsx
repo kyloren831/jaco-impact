@@ -114,19 +114,27 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-verde transition-all group-hover:w-full"></span>
             </a>
           </li>
-          <li>
+          <li className="flex items-center gap-2 ml-2">
             {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="ml-2 px-5 py-2 rounded-full text-sm font-bold text-white bg-brand-rojo/80 hover:bg-brand-rojo transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60"
-              >
-                {loggingOut ? "Saliendo…" : "Cerrar Sesión"}
-              </button>
+              <>
+                <Link
+                  href="/dashboard"
+                  className="px-5 py-2 rounded-full text-sm font-bold text-white bg-brand-verde hover:bg-brand-turquesa transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                  Mi Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="px-5 py-2 rounded-full text-sm font-bold text-white bg-brand-rojo/80 hover:bg-brand-rojo transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60"
+                >
+                  {loggingOut ? "Saliendo…" : "Cerrar Sesión"}
+                </button>
+              </>
             ) : (
               <Link
                 href="/login"
-                className="ml-2 px-5 py-2 rounded-full text-sm font-bold text-white bg-brand-verde hover:bg-brand-turquesa transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                className="px-5 py-2 rounded-full text-sm font-bold text-white bg-brand-verde hover:bg-brand-turquesa transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
               >
                 Iniciar Sesión
               </Link>
@@ -152,15 +160,24 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
             <a href="#pilares" onClick={(e) => handleSmoothScroll(e, "pilares")} className="text-white font-medium text-lg">Pilares</a>
             <a href="#galeria" onClick={(e) => handleSmoothScroll(e, "galeria")} className="text-white font-medium text-lg">Actividades</a>
             <a href="#contact" onClick={(e) => handleSmoothScroll(e, "contact")} className="text-white font-medium text-lg">Contacto</a>
-            <div className="border-t border-white/20 pt-4 mt-2">
+            <div className="border-t border-white/20 pt-4 mt-2 flex flex-col gap-3">
               {isLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  disabled={loggingOut}
-                  className="w-full px-5 py-3 rounded-full text-sm font-bold text-white bg-brand-rojo/80 hover:bg-brand-rojo transition-all duration-300 disabled:opacity-60"
-                >
-                  {loggingOut ? "Saliendo…" : "Cerrar Sesión"}
-                </button>
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block w-full text-center px-5 py-3 rounded-full text-sm font-bold text-white bg-brand-verde hover:bg-brand-turquesa transition-all duration-300"
+                  >
+                    Ir al Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                    className="w-full px-5 py-3 rounded-full text-sm font-bold text-white bg-brand-rojo/80 hover:bg-brand-rojo transition-all duration-300 disabled:opacity-60"
+                  >
+                    {loggingOut ? "Saliendo…" : "Cerrar Sesión"}
+                  </button>
+                </>
               ) : (
                 <Link
                   href="/login"
