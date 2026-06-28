@@ -7,17 +7,18 @@ import { useState } from "react";
 
 const adminNavItems = [
   { name: "Dashboard", href: "/dashboard/admin", icon: DashboardIcon },
+  { name: "Mi Perfil", href: "/dashboard/profile", icon: UserIcon },
   { name: "Usuarios", href: "/dashboard/admin/users", icon: UsersIcon },
   { name: "Pilares", href: "/dashboard/admin/pillars", icon: LayersIcon },
   { name: "Voluntarios", href: "/dashboard/admin/volunteers", icon: HeartIcon },
   { name: "Proyectos", href: "/dashboard/admin/projects", icon: CalendarIcon },
   { name: "Eventos y Tareas", href: "/dashboard/admin/events", icon: CheckCircleIcon },
-  { name: "Noticias", href: "/dashboard/admin/news", icon: NewspaperIcon },
   { name: "Pymes y Productos", href: "/dashboard/admin/pymes", icon: StoreIcon },
 ];
 
 const volunteerNavItems = [
   { name: "Dashboard", href: "/dashboard/volunteer", icon: DashboardIcon },
+  { name: "Mi Perfil", href: "/dashboard/profile", icon: UserIcon },
   { name: "Proyectos", href: "/dashboard/volunteer/projects", icon: CalendarIcon },
   { name: "Eventos", href: "/dashboard/volunteer/events", icon: CheckCircleIcon },
   { name: "Mis Tareas", href: "/dashboard/volunteer/tasks", icon: CheckCircleIcon },
@@ -67,7 +68,7 @@ export default function DashboardSidebar({ roles = ["VOLUNTEER"] }: DashboardSid
       {/* Mobile Menu Button */}
       <div className="md:hidden p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex justify-between items-center fixed top-0 left-0 right-0 z-40 shadow-sm h-16">
         <Link href="/">
-          <Image src="/letters-logo.png" alt="Jaco Impact" width={120} height={34} className="h-8 w-auto brightness-0 dark:invert" priority />
+          <Image src="/letters-logo.png" alt="Jacó Impact" width={120} height={34} className="h-8 w-auto brightness-0 dark:invert" priority />
         </Link>
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -88,7 +89,7 @@ export default function DashboardSidebar({ roles = ["VOLUNTEER"] }: DashboardSid
         <div className="p-6">
           <div className="mb-8 hidden md:block">
             <Link href="/">
-              <Image src="/letters-logo.png" alt="Jaco Impact" width={160} height={46} className="h-10 w-auto brightness-0 dark:invert" priority />
+              <Image src="/letters-logo.png" alt="Jacó Impact" width={160} height={46} className="h-10 w-auto brightness-0 dark:invert" priority />
             </Link>
           </div>
           <nav className="space-y-1.5">
@@ -157,4 +158,6 @@ function MenuIcon(props: React.SVGProps<SVGSVGElement>) {
 function LayersIcon(props: React.SVGProps<SVGSVGElement>) {
   return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 11l-7 4-7-4m14-3l-7 4-7-4m14 6l-7 4-7-4m7-10l-7 4-7-4 7-4 7 4z" /></svg>;
 }
-
+function UserIcon(props: React.SVGProps<SVGSVGElement>) {
+  return <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>;
+}

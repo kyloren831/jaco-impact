@@ -49,7 +49,7 @@ export default async function DashboardPage() {
         </h2>
         <p className="mt-4 text-lg text-gray-600 max-w-3xl relative z-10">
           Bienvenido a tu panel de control. Aquí podrás gestionar tu actividad
-          dentro de Jaco Impact. Utiliza el menú lateral para navegar por las distintas secciones.
+          dentro de Jacó Impact. Utiliza el menú lateral para navegar por las distintas secciones.
         </p>
       </div>
 

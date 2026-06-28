@@ -117,8 +117,8 @@ export async function resetAndSeed() {
     data: {
       pillarId: pillar.id,
       createdBy: coordUser.id,
-      name: "Limpieza de Playa Jaco",
-      description: "Proyecto para limpiar la playa de Jaco",
+      name: "Limpieza de Playa Jacó",
+      description: "Proyecto para limpiar la playa de Jacó",
       status: "PUBLISHED",
       visibility: "PUBLIC",
     }

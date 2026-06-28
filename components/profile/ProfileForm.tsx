@@ -2,8 +2,7 @@
 
 import { useState, useTransition, useRef, ChangeEvent } from "react";
 import { Camera, Save, Loader2, User, Mail, Phone, MapPin, Briefcase, Heart, Clock, AlertCircle, CheckCircle2 } from "lucide-react";
-import { updateProfileAction } from "@/features/profile/actions";
-import { getPresignedUploadUrlAction } from "@/features/evidences/actions";
+import { updateProfileAction, uploadProfileImageAction } from "@/features/profile/actions";
 
 interface ProfileFormProps {
   initialData: {
@@ -25,7 +24,19 @@ interface ProfileFormProps {
 
 export default function ProfileForm({ initialData }: ProfileFormProps) {
   const [isPending, startTransition] = useTransition();
-  const [formData, setFormData] = useState({ ...initialData });
+  const [formData, setFormData] = useState({
+    ...initialData,
+    volunteer: initialData.roles.includes("VOLUNTEER") && !initialData.volunteer
+      ? {
+          phone: "",
+          nationality: "",
+          profession: "",
+          emergencyContactName: "",
+          emergencyContactPhone: "",
+          inmediateAvailability: false,
+        }
+      : initialData.volunteer
+  });
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -66,31 +77,16 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     setMessage(null);
 
     try {
-      // 1. Get presigned URL
-      const res = await getPresignedUploadUrlAction(file.name, file.type);
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+
+      const res = await uploadProfileImageAction(uploadData);
       
       if (!res.success || !res.data) {
-        throw new Error(res.error || "No se pudo obtener la URL de subida");
+        throw new Error(res.error || "Error al subir la imagen");
       }
 
-      // 2. Upload file
-      const uploadRes = await fetch(res.data.uploadUrl, {
-        method: "PUT",
-        body: file,
-        headers: { "Content-Type": file.type },
-      });
-
-      if (!uploadRes.ok) {
-        // If fake URL fails, simulate success for development:
-        if (res.data.uploadUrl.includes("fake-s3")) {
-          console.warn("Using fake S3 upload");
-        } else {
-          throw new Error("Error al subir el archivo");
-        }
-      }
-
-      // 3. Update state with new URL
-      setFormData(prev => ({ ...prev, imageUrl: res.data!.fileUrl }));
+      setFormData(prev => ({ ...prev, imageUrl: res.data.fileUrl }));
       showMessage("success", "Imagen actualizada exitosamente. No olvides guardar los cambios.");
     } catch (error: any) {
       showMessage("error", error.message || "Error al actualizar la imagen");
@@ -352,7 +348,19 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
           <button
             type="button"
             className="px-6 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-sm"
-            onClick={() => setFormData({ ...initialData })}
+            onClick={() => setFormData({
+              ...initialData,
+              volunteer: initialData.roles.includes("VOLUNTEER") && !initialData.volunteer
+                ? {
+                    phone: "",
+                    nationality: "",
+                    profession: "",
+                    emergencyContactName: "",
+                    emergencyContactPhone: "",
+                    inmediateAvailability: false,
+                  }
+                : initialData.volunteer
+            })}
           >
             Descartar Cambios
           </button>

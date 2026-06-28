@@ -70,7 +70,7 @@ export default function HeroSection() {
         </div>
         <p className="font-[var(--font-sans)] text-[clamp(1.2rem,3vw,1.5rem)] font-bold text-[var(--color-brand-amarillo)] mb-4 tracking-[2px] [animation:fadeInUp_1s_ease-out_0.2s_both]">| DE, PARA Y POR LA COMUNIDAD |</p>
         <h1 className="text-4xl md:text-6xl lg:text-[4.5rem] font-black leading-[1.1] tracking-[-0.02em] mb-6 drop-shadow-md">
-          Jacó Impact: <br />Transformando <span className="bg-gradient-to-br from-[var(--color-brand-verde)] to-[var(--color-brand-turquesa)] bg-clip-text text-transparent">Jaco Juntos.</span>
+          Jacó Impact: <br />Transformando <span className="bg-gradient-to-br from-[var(--color-brand-verde)] to-[var(--color-brand-turquesa)] bg-clip-text text-transparent">Jacó Juntos.</span>
         </h1>
         <p className="text-xl md:text-2xl font-light mb-10 max-w-[700px] mx-auto opacity-90 leading-relaxed shadow-neutral-900 drop-shadow-sm">
           Plataforma de gestión social.

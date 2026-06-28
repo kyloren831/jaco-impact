@@ -74,7 +74,7 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
         <Link href="/" className="flex items-center ml-auto md:ml-0">
           <Image
             src="/letters-logo.png"
-            alt="Jaco Impact"
+            alt="Jacó Impact"
             width={180}
             height={52}
             className={`h-[52px] w-auto opacity-92 ${variant === "dashboard" ? "brightness-0 dark:invert" : ""}`}
@@ -105,6 +105,12 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
           <li>
             <a href="#galeria" onClick={(e) => handleSmoothScroll(e, "galeria")} className={`${variant === "dashboard" ? "text-gray-900 dark:text-gray-100" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
               Actividades
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-verde transition-all group-hover:w-full"></span>
+            </a>
+          </li>
+          <li>
+            <a href="#emprendedores" onClick={(e) => handleSmoothScroll(e, "emprendedores")} className={`${variant === "dashboard" ? "text-gray-900 dark:text-gray-100" : "text-white"} font-medium hover:text-brand-verde transition-colors relative group`}>
+              Emprendedores
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-verde transition-all group-hover:w-full"></span>
             </a>
           </li>
@@ -159,6 +165,7 @@ export default function Navbar({ variant = "default" }: NavbarProps) {
             <a href="#impact" onClick={(e) => handleSmoothScroll(e, "impact")} className="text-white font-medium text-lg">Impacto</a>
             <a href="#pilares" onClick={(e) => handleSmoothScroll(e, "pilares")} className="text-white font-medium text-lg">Pilares</a>
             <a href="#galeria" onClick={(e) => handleSmoothScroll(e, "galeria")} className="text-white font-medium text-lg">Actividades</a>
+            <a href="#emprendedores" onClick={(e) => handleSmoothScroll(e, "emprendedores")} className="text-white font-medium text-lg">Emprendedores</a>
             <a href="#contact" onClick={(e) => handleSmoothScroll(e, "contact")} className="text-white font-medium text-lg">Contacto</a>
             <div className="border-t border-white/20 pt-4 mt-2 flex flex-col gap-3">
               {isLoggedIn ? (

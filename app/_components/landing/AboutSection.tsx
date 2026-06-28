@@ -28,7 +28,7 @@ export default function AboutSection() {
               >
                 <Image
                   src="/Yorgina-Ureña.png"
-                  alt="Yorgina Ureña — Fundadora de Jaco Impact"
+                  alt="Yorgina Ureña — Fundadora de Jacó Impact"
                   width={280}
                   height={1080}
                   className="w-full h-auto object-contain"
@@ -52,7 +52,7 @@ export default function AboutSection() {
               </span>
             </h2>
             <p className="text-white/90 text-base sm:text-lg leading-[1.8] mb-5 drop-shadow-sm">
-              Jaco Impact nació en Noviembre del 2017 por iniciativa de{' '}
+              Jacó Impact nació en Noviembre del 2017 por iniciativa de{' '}
               <strong className="text-white">Yorgina Ureña</strong>, una joven emprendedora,
               vecina del Cantón de Garabito, quién con un profundo amor por su comunidad decidió
               unificar propósitos en acción.

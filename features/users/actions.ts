@@ -126,7 +126,7 @@ export async function getVolunteerDashboardDataAction() {
     });
 
     if (!volunteer) {
-      return { success: false as const, error: "No eres un voluntario registrado" };
+      return { success: false as const, error: "No eres un voluntario registrado", needsProfile: true };
     }
 
     const tasks = await prisma.taskAssignment.findMany({

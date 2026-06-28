@@ -25,8 +25,8 @@ export default async function VolunteerProjectsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project: any) => (
             <div key={project.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col">
-              {project.imageUrl ? (
-                <img src={project.imageUrl} alt={project.name} className="w-full h-48 object-cover" />
+              {project.photoUrl ? (
+                <img src={project.photoUrl} alt={project.name} className="w-full h-48 object-cover" />
               ) : (
                 <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400">
                   Sin Imagen

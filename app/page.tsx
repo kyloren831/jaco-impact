@@ -6,11 +6,22 @@ import ImpactStatsSection from './_components/landing/ImpactStatsSection';
 import PilaresSection from './_components/landing/PilaresSection';
 import GaleriaSection from './_components/landing/GaleriaSection';
 import CtaSection from './_components/landing/CtaSection';
+import ProductosSection from './_components/landing/ProductosSection';
 
 import { impactStatsData, actividadesData } from '@/lib/seed-data/landing';
 import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
+  const dbPymes = await prisma.pyme.findMany({
+    where: { isActive: true },
+    include: {
+      products: {
+        where: { isActive: true },
+        orderBy: { createdAt: 'desc' }
+      }
+    },
+    orderBy: { createdAt: 'desc' },
+  });
   const dbPillars = await prisma.pillar.findMany({
     where: { isActive: true },
     orderBy: { id: 'asc' },
@@ -42,7 +53,7 @@ export default async function Home() {
   });
 
   return (
-    <main className="min-h-screen">
+    <main className="dark min-h-screen bg-background text-foreground">
       <Navbar />
       
       <HeroSection />
@@ -50,6 +61,7 @@ export default async function Home() {
       <ImpactStatsSection stats={impactStatsData} />
       <PilaresSection pilares={dbPillars} />
       <GaleriaSection proyectos={activeProjects} pilares={dbPillars} />
+      <ProductosSection pymes={dbPymes} />
       <CtaSection />
 
       <Footer />

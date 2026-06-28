@@ -3,7 +3,7 @@ import { EventPrismaRepository } from '../../infrastructure/prisma/repositories/
 import { CreateEventDTO, UpdateEventDTO } from './event.types';
 import { EventStatus, AssignmentStatus } from '../../generated/prisma/client';
 import { eventStateMachine } from './event.state-machine';
-import { EventNotFoundError } from './event.errors';
+import { EventNotFoundError, EventDateOutsideProjectError } from './event.errors';
 import { domainEventBus } from '../shared/domain-event-bus';
 import { DOMAIN_EVENTS } from '../shared/events';
 import { withTransaction } from '../../lib/prisma';
@@ -27,6 +27,22 @@ export class EventDomainService {
 
   async createEvent(data: CreateEventDTO, actorId: number) {
     return withTransaction(async (tx) => {
+      // Validate dates against project
+      const project = await tx.project.findUnique({ where: { id: data.projectId } });
+      if (project) {
+        const validateDate = (d?: Date | null) => {
+          if (!d) return true;
+          const dt = new Date(d).getTime();
+          if (project.startDate && dt < new Date(project.startDate).setHours(0,0,0,0)) return false;
+          if (project.endDate && dt > new Date(project.endDate).setHours(23,59,59,999)) return false;
+          return true;
+        };
+
+        if (!validateDate(data.eventDate) || !validateDate(data.startDate) || !validateDate(data.endDate)) {
+          throw new EventDateOutsideProjectError(data.projectId);
+        }
+      }
+
       // Create the event
       const event = await (this.repository as EventPrismaRepository).create(data, actorId, tx);
 
@@ -122,6 +138,26 @@ export class EventDomainService {
       const event = await (this.repository as EventPrismaRepository).findById(id, tx);
       if (!event) {
         throw new EventNotFoundError(id);
+      }
+
+      // Validate dates against project
+      const project = await tx.project.findUnique({ where: { id: event.projectId } });
+      if (project) {
+        const validateDate = (d?: Date | null) => {
+          if (!d) return true;
+          const dt = new Date(d).getTime();
+          if (project.startDate && dt < new Date(project.startDate).setHours(0,0,0,0)) return false;
+          if (project.endDate && dt > new Date(project.endDate).setHours(23,59,59,999)) return false;
+          return true;
+        };
+
+        const checkEventDate = data.eventDate !== undefined ? data.eventDate : event.eventDate;
+        const checkStartDate = data.startDate !== undefined ? data.startDate : event.startDate;
+        const checkEndDate = data.endDate !== undefined ? data.endDate : event.endDate;
+
+        if (!validateDate(checkEventDate) || !validateDate(checkStartDate) || !validateDate(checkEndDate)) {
+          throw new EventDateOutsideProjectError(event.projectId);
+        }
       }
 
       const updatedEvent = await (this.repository as EventPrismaRepository).updateDetails(id, data, tx);

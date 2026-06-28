@@ -4,7 +4,7 @@ import AvailabilitySection from "@/components/profile/AvailabilitySection";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Mi Perfil | Jaco Impact",
+  title: "Mi Perfil | Jacó Impact",
   description: "Gestiona tu información personal",
 };
 
@@ -31,7 +31,7 @@ export default async function ProfilePage() {
         <ProfileForm initialData={res.data as any} />
       </div>
 
-      {(res.data as any).roles.includes("VOLUNTEER") && (
+      {(res.data as any).roles.includes("VOLUNTEER") && (res.data as any).volunteer && (
         <AvailabilitySection availabilities={availabilities} />
       )}
     </div>

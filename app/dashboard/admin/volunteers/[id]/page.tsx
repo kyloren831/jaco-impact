@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { User, Mail, Phone, MapPin, Briefcase, Heart, Clock, AlertCircle, ArrowLeft, Calendar, ClipboardList, ShieldCheck, ShieldAlert } from "lucide-react";
 
 export const metadata = {
-  title: "Detalle de Voluntario | Jaco Impact",
+  title: "Detalle de Voluntario | Jacó Impact",
 };
 
 export default async function VolunteerDetailPage({ params }: { params: Promise<{ id: string }> }) {

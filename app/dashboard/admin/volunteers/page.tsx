@@ -2,7 +2,7 @@ import { getVolunteersListAction } from "@/features/admin/volunteers/actions";
 import VolunteersListClient from "./VolunteersListClient";
 
 export const metadata = {
-  title: "Gestión de Voluntarios | Jaco Impact",
+  title: "Gestión de Voluntarios | Jacó Impact",
   description: "Administra los voluntarios de la organización",
 };
 
@@ -22,7 +22,7 @@ export default async function AdminVolunteersPage() {
       <div>
         <h1 className="text-4xl font-black text-gray-900 dark:text-white font-headline">Voluntarios</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-2 font-medium font-body">
-          Gestión de voluntarios de Jaco Impact
+          Gestión de voluntarios de Jacó Impact
         </p>
       </div>
 

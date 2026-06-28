@@ -13,7 +13,7 @@ export default function CtaSection() {
           ¿Quieres ser parte del cambio?
         </h2>
         <p className="text-white/90 text-lg md:text-xl mb-10 max-w-2xl mx-auto font-medium">
-          Ya sea donando tu tiempo, recursos o talento, cada contribución suma. Únete a Jaco Impact y construyamos juntos una mejor comunidad.
+          Ya sea donando tu tiempo, recursos o talento, cada contribución suma. Únete a Jacó Impact y construyamos juntos una mejor comunidad.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/register" className="px-8 py-4 bg-white text-brand-verde font-extrabold rounded-full transition-transform hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] shadow-lg uppercase tracking-wide text-sm">

@@ -143,27 +143,36 @@ export async function upsertMyPymeAction(data: UpsertPymeData) {
   }
 }
 
-type AddProductData = {
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-};
-
-export async function addProductAction(data: AddProductData) {
+export async function addProductAction(formData: FormData) {
   const session = await requireRole(["PYME_MANAGER"]);
   
   const existingManager = await prisma.pymeManager.findUniqueOrThrow({
     where: { userId: session.userId }
   });
 
+  const name = formData.get("name") as string;
+  const description = formData.get("description") as string;
+  const price = parseFloat(formData.get("price") as string);
+  const file = formData.get("image") as File | null;
+
+  if (!name || !description || isNaN(price) || !file) {
+    throw new Error("Todos los campos, incluyendo la imagen, son obligatorios");
+  }
+
+  if (!file.type.startsWith("image/")) {
+    throw new Error("El archivo debe ser una imagen");
+  }
+
+  const { uploadFileToR2 } = await import("@/lib/storage/r2");
+  const imageUrl = await uploadFileToR2(file, "products");
+
   const product = await prisma.product.create({
     data: {
       pymeId: existingManager.pymeId,
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      imageUrl: data.imageUrl,
+      name,
+      description,
+      price,
+      imageUrl,
       isActive: true,
     }
   });

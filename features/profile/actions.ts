@@ -56,20 +56,28 @@ export async function updateProfileAction(data: any) {
   }
 }
 
-export async function getPresignedUploadUrlAction(fileName: string, fileType: string) {
+export async function uploadProfileImageAction(formData: FormData) {
   try {
     await requireAuth();
     
+    const file = formData.get("file") as File | null;
+    if (!file) {
+      return { success: false, error: "No se proporcionó ningún archivo" };
+    }
+
     const ALLOWED_MIME_TYPES = [
       "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
     ];
 
-    if (!ALLOWED_MIME_TYPES.includes(fileType)) {
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
       return { success: false, error: "Tipo de archivo no permitido" };
     }
 
-    const data = await getPresignedUploadUrl(fileName, fileType);
-    return { success: true, data };
+    // Usamos uploadFileToR2 directamente en el servidor para evitar problemas de CORS
+    const { uploadFileToR2 } = await import("@/lib/storage/r2");
+    const fileUrl = await uploadFileToR2(file, "profiles");
+    
+    return { success: true, data: { fileUrl } };
   } catch (error: any) {
     return { success: false, error: error.message };
   }

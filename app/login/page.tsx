@@ -25,7 +25,7 @@ export default function LoginPage() {
         <Link href="/">
           <Image
             src="/letters-logo.png"
-            alt="Jaco Impact"
+            alt="Jacó Impact"
             width={180}
             height={52}
             className={styles.logoImage}
@@ -60,7 +60,7 @@ export default function LoginPage() {
 
           {/* Right form panel */}
           <div className={styles.formPanel}>
-            <h2 className={styles.title}>Jaco Impact</h2>
+            <h2 className={styles.title}>Jacó Impact</h2>
             <p className={styles.subtitle}>¡Bienvenido de vuelta!</p>
 
             {/* Google sign-in button */}

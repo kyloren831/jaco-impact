@@ -54,15 +54,9 @@ export default function PymeDashboardPage() {
   const handleAddProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      price: parseFloat(formData.get("price") as string),
-      imageUrl: formData.get("imageUrl") as string,
-    };
 
     try {
-      await addProductAction(data);
+      await addProductAction(formData);
       toast.success("Producto agregado.");
       setIsAddingProduct(false);
       fetchPyme();
@@ -258,9 +252,8 @@ export default function PymeDashboardPage() {
             <input required name="price" type="number" step="0.01" className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2 text-sm focus:ring-brand-verde focus:border-brand-verde" />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">URL de Imagen</label>
-            <input required name="imageUrl" type="url" placeholder="https://..." className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2 text-sm focus:ring-brand-verde focus:border-brand-verde" />
-            <p className="text-xs text-gray-500">Por ahora usa una URL de imagen válida.</p>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Imagen del Producto</label>
+            <input required name="image" type="file" accept="image/*" className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2 text-sm focus:ring-brand-verde focus:border-brand-verde" />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>

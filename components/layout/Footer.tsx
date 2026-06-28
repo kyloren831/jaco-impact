@@ -15,7 +15,7 @@ export default function Footer() {
                                 fill="#39B44A" />
                             <circle cx="20" cy="20" r="4" fill="#fff" />
                         </svg>
-                        <span className="font-extrabold text-2xl tracking-tight">Jaco Impact</span>
+                        <span className="font-extrabold text-2xl tracking-tight">Jacó Impact</span>
                     </div>
                     <p className="opacity-70 leading-relaxed mb-6 max-w-sm">
                         Movimiento social dedicado a fortalecer comunidades y enfrentar desafíos socioeconómicos y ambientales en Jacó, Costa Rica desde 2017.
@@ -60,7 +60,7 @@ export default function Footer() {
             </div>
 
             <div className="pt-8 border-t border-white/10 text-center opacity-60 text-sm">
-                <p>2024 Jaco Impact. Todos los derechos reservados. | De, Para y Por la Comunidad</p>
+                <p>2024 Jacó Impact. Todos los derechos reservados. | De, Para y Por la Comunidad</p>
             </div>
         </div>
     </footer>

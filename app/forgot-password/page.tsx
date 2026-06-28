@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
 
       <div className={styles.logo}>
         <Link href="/">
-          <Image src="/letters-logo.png" alt="Jaco Impact" width={180} height={52} className={styles.logoImage} priority />
+          <Image src="/letters-logo.png" alt="Jacó Impact" width={180} height={52} className={styles.logoImage} priority />
         </Link>
       </div>
 
@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
           <div className={styles.imagePanel} />
 
           <div className={styles.formPanel}>
-            <h2 className={styles.title}>Jaco Impact</h2>
+            <h2 className={styles.title}>Jacó Impact</h2>
             <p className={styles.subtitle}>Recuperar Contraseña</p>
 
             {state?.error && (

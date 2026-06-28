@@ -31,7 +31,7 @@ export default function RegisterPage() {
 
       <div className={styles.logo}>
         <Link href="/">
-          <Image src="/letters-logo.png" alt="Jaco Impact" width={180} height={52} className={styles.logoImage} priority />
+          <Image src="/letters-logo.png" alt="Jacó Impact" width={180} height={52} className={styles.logoImage} priority />
         </Link>
       </div>
 
@@ -52,7 +52,7 @@ export default function RegisterPage() {
           <div className={styles.imagePanel} />
 
           <div className={styles.formPanel}>
-            <h2 className={styles.title}>Jaco Impact</h2>
+            <h2 className={styles.title}>Jacó Impact</h2>
             <p className={styles.subtitle}>¡Únete a nuestra comunidad!</p>
 
             {state?.error && (

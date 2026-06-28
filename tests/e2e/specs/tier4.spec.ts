@@ -60,7 +60,7 @@ describe("Tier 4 E2E Test Suite - Real-World Application Workloads", () => {
       data: {
         projectId: seed.project.id,
         createdBy: seed.coordUser.id,
-        name: "Jaco Beach Cleanup Campaign 2026",
+        name: "Jacó Beach Cleanup Campaign 2026",
         eventDate: new Date(),
         visibility: "PUBLIC",
         status: "OPEN",
