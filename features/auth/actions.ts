@@ -106,15 +106,15 @@ const RegisterSchema = z.object({
 export async function registerAction(prevState: any, formData: FormData) {
   try {
     const rawData = {
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      password: formData.get("password") as string,
-      phone: formData.get("phone") as string,
-      nationality: formData.get("nationality") as string,
-      profession: formData.get("profession") as string,
-      emergencyContactName: formData.get("emergencyContactName") as string,
-      emergencyContactPhone: formData.get("emergencyContactPhone") as string,
-      inmediateAvailability: formData.get("inmediateAvailability") as string,
+      name: (formData.get("name") as string) || "",
+      email: (formData.get("email") as string) || "",
+      password: (formData.get("password") as string) || "",
+      phone: (formData.get("phone") as string) || "",
+      nationality: (formData.get("nationality") as string) || "",
+      profession: (formData.get("profession") as string) || undefined,
+      emergencyContactName: (formData.get("emergencyContactName") as string) || undefined,
+      emergencyContactPhone: (formData.get("emergencyContactPhone") as string) || undefined,
+      inmediateAvailability: (formData.get("inmediateAvailability") as string) || undefined,
     };
 
     const result = RegisterSchema.safeParse(rawData);
