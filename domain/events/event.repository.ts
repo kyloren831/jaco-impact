@@ -3,11 +3,11 @@ import { CreateEventDTO, EventWithParticipations, UpdateEventDTO } from './event
 import { PaginationParams, PaginatedResult } from '../shared/types';
 
 export interface IEventRepository {
-  findById(id: number): Promise<Event | null>;
-  findByIdWithParticipations(id: number): Promise<EventWithParticipations | null>;
-  findByProjectId(projectId: number): Promise<Event[]>;
-  findAll(pagination?: PaginationParams): Promise<PaginatedResult<Event>>;
-  create(data: CreateEventDTO, createdBy: number): Promise<Event>;
-  updateStatus(id: number, status: EventStatus): Promise<Event>;
-  updateDetails(id: number, data: UpdateEventDTO): Promise<Event>;
+  findById(id: number, tx?: any): Promise<Event | null>;
+  findByIdWithParticipations(id: number, tx?: any): Promise<EventWithParticipations | null>;
+  findByProjectId(projectId: number, tx?: any): Promise<Event[]>;
+  findAll(pagination?: PaginationParams, tx?: any): Promise<PaginatedResult<Event>>;
+  create(data: CreateEventDTO, createdBy: number, tx?: any): Promise<Event>;
+  updateStatus(id: number, status: EventStatus, tx?: any): Promise<Event>;
+  updateDetails(id: number, data: UpdateEventDTO, tx?: any): Promise<Event>;
 }

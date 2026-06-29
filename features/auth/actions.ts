@@ -120,7 +120,7 @@ export async function registerAction(prevState: any, formData: FormData) {
     const result = RegisterSchema.safeParse(rawData);
 
     if (!result.success) {
-      return { success: false, error: result.error.errors[0]?.message || "Datos inválidos" };
+      return { success: false, error: result.error.issues[0]?.message || "Datos inválidos" };
     }
 
     const { name, email, password, phone, nationality, profession, emergencyContactName, emergencyContactPhone, inmediateAvailability } = result.data;
