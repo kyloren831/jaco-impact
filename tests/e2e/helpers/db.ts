@@ -20,6 +20,9 @@ export async function resetAndSeed() {
   await prisma.session.deleteMany();
   await prisma.activityLog.deleteMany();
   await prisma.userRole.deleteMany();
+  if ((prisma as any).notification) {
+    await (prisma as any).notification.deleteMany();
+  }
   await prisma.user.deleteMany();
 
   console.log("Seeding database...");

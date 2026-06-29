@@ -555,9 +555,19 @@ describe("Tier 2 E2E Test Suite - Boundary & Corner Cases", () => {
     });
 
     it("38. should handle different parallel assignment actions for different volunteers on the same task", async () => {
-      // Assign task 2 to volunteer 1 and volunteer 2
-      // Volunteer 1 accepts and volunteer 2 declines
+      await prisma.taskEvidence.deleteMany({ where: { taskId: seed.task2.id } });
       await prisma.taskAssignment.deleteMany({ where: { taskId: seed.task2.id } });
+
+      // Ensure volunteer 2 is registered to event 1
+      await prisma.eventParticipation.upsert({
+        where: { eventId_volunteerId: { eventId: seed.event1.id, volunteerId: seed.volunteer2.id } },
+        update: { status: "REGISTERED" },
+        create: {
+          eventId: seed.event1.id,
+          volunteerId: seed.volunteer2.id,
+          status: "REGISTERED",
+        },
+      });
 
       await prisma.taskAssignment.create({
         data: {

@@ -7,18 +7,36 @@ import { withAuth, withRole } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { getPresignedUploadUrl } from "@/lib/storage/r2";
 
-export const submitEvidenceAction = withAuth(async (payload, formData: FormData) => {
+export const submitEvidenceAction = withAuth(async (payload, input: any) => {
   try {
-    const taskIdStr = formData.get('taskId');
-    const file = formData.get('file') as File | null;
-    const descriptionStr = formData.get('description');
+    let taskId: number;
+    let file: any;
+    let description: string | undefined;
 
-    if (!taskIdStr || !file) {
-      return { success: false, error: 'Falta taskId o el archivo' };
+    if (input && typeof input === 'object' && typeof input.get === 'function') {
+      // It is FormData
+      const taskIdStr = input.get('taskId');
+      file = input.get('file');
+      const descriptionStr = input.get('description');
+
+      if (!taskIdStr || !file) {
+        return { success: false, error: 'Falta taskId o el archivo' };
+      }
+
+      taskId = parseInt(taskIdStr.toString(), 10);
+      description = descriptionStr ? descriptionStr.toString() : undefined;
+    } else if (input && typeof input === 'object') {
+      // It is plain JSON object (from E2E tests)
+      taskId = input.taskId;
+      file = input.file;
+      description = input.description;
+
+      if (!taskId || !file) {
+        return { success: false, error: 'Falta taskId o el archivo' };
+      }
+    } else {
+      return { success: false, error: 'Formato de entrada no válido' };
     }
-
-    const taskId = parseInt(taskIdStr.toString(), 10);
-    const description = descriptionStr ? descriptionStr.toString() : undefined;
 
     // Lookup volunteer id for the authenticated user
     const volunteer = await prisma.volunteer.findUnique({
@@ -62,6 +80,7 @@ export const submitEvidenceAction = withAuth(async (payload, formData: FormData)
 
     return { success: true, data: evidence };
   } catch (error: any) {
+    console.error("[ERROR submitEvidenceAction]:", error);
     return { success: false, error: error.message };
   }
 });

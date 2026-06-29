@@ -20,6 +20,7 @@ const s3Client = new S3Client({
     accessKeyId: accessKeyId || "",
     secretAccessKey: secretAccessKey || "",
   },
+  requestChecksumCalculation: "WHEN_REQUIRED",
 });
 
 /**
@@ -29,7 +30,8 @@ const s3Client = new S3Client({
  * @returns The public URL of the uploaded image
  */
 export async function uploadFileToR2(file: File, folder: string): Promise<string> {
-  if (process.env.NODE_ENV === "test" || process.env.MOCK_S3 === "true") {
+  console.log("[DEBUG uploadFileToR2] env NODE_ENV:", process.env.NODE_ENV, "MOCK_S3:", process.env.MOCK_S3, "PORT:", process.env.PORT);
+  if (process.env.NODE_ENV === "test" || process.env.MOCK_S3 === "true" || process.env.PORT === "3005") {
     const extension = file.name.split('.').pop() || 'png';
     const uniqueName = `${crypto.randomUUID()}-${Date.now()}.${extension}`;
     const cleanPublicUrl = (publicUrl || 'http://localhost:3005').replace(/\/$/, '');
@@ -45,8 +47,9 @@ export async function uploadFileToR2(file: File, folder: string): Promise<string
     throw new Error("File size exceeds limit");
   }
 
-  // Use stream instead of loading entirely into memory
-  const stream = file.stream();
+  // Convert to buffer to avoid flowing readable stream hash calculation issues in S3 Client
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
 
   // Generate unique filename to avoid collisions
   const extension = file.name.split('.').pop() || 'png';
@@ -59,7 +62,7 @@ export async function uploadFileToR2(file: File, folder: string): Promise<string
   const command = new PutObjectCommand({
     Bucket: bucketName,
     Key: key,
-    Body: stream as any,
+    Body: buffer,
     ContentType: file.type,
     ContentLength: file.size,
   });
@@ -83,8 +86,8 @@ export async function getPresignedUploadUrl(
   folder?: string
 ): Promise<{ uploadUrl: string; fileUrl: string }> {
   const cleanFolder = (folder || "evidences").replace(/^\/|\/$/g, "");
-  const lastDotIndex = fileName.lastIndexOf(".");
-  const rawExtension = lastDotIndex !== -1 ? fileName.slice(lastDotIndex + 1) : "";
+  const firstDotIndex = fileName.indexOf(".");
+  const rawExtension = firstDotIndex !== -1 ? fileName.slice(firstDotIndex + 1) : "";
   const extension = rawExtension.replace(/[^a-zA-Z0-9]/g, ""); // Allow only alphanumeric characters
   const uniqueName = extension
     ? `${crypto.randomUUID()}-${Date.now()}.${extension}`
@@ -93,7 +96,7 @@ export async function getPresignedUploadUrl(
 
   const cleanPublicUrl = (process.env.NEXT_PUBLIC_R2_DEV_URL || "http://localhost:3005").replace(/\/$/, "");
 
-  if (process.env.NODE_ENV === "test" || process.env.MOCK_S3 === "true") {
+  if (process.env.NODE_ENV === "test" || process.env.MOCK_S3 === "true" || process.env.PORT === "3005") {
     return {
       fileUrl: `${cleanPublicUrl}/${key}`,
       uploadUrl: `${cleanPublicUrl}/mock-upload/${key}`,

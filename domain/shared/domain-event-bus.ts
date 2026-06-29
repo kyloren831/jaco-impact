@@ -50,6 +50,14 @@ class InMemoryDomainEventBus implements IDomainEventBus {
   }
 }
 
+declare global {
+  var domainEventBus: InMemoryDomainEventBus | undefined;
+}
+
 // Singleton instance export
-export const domainEventBus = new InMemoryDomainEventBus();
+export const domainEventBus = global.domainEventBus || new InMemoryDomainEventBus();
+
+if (process.env.NODE_ENV !== "production") {
+  global.domainEventBus = domainEventBus;
+}
 

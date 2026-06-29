@@ -17,6 +17,7 @@ export class DevServerManager {
       env: {
         ...process.env,
         PORT: String(this.port),
+        MOCK_S3: "true",
         // Ensure Next.js doesn't open browser, etc.
       },
       stdio: "pipe",
@@ -24,11 +25,11 @@ export class DevServerManager {
     });
 
     this.proc.stdout?.on("data", (data) => {
-      // console.log(`[Next.js stdout] ${data}`);
+      console.log(`[Next.js stdout] ${data}`);
     });
 
     this.proc.stderr?.on("data", (data) => {
-      // console.error(`[Next.js stderr] ${data}`);
+      console.error(`[Next.js stderr] ${data}`);
     });
 
     await this.waitForServer();
@@ -53,9 +54,18 @@ export class DevServerManager {
     console.log("Triggering route compilation via /test-actions...");
     return new Promise((resolve, reject) => {
       const req = http.get(`http://localhost:${this.port}/test-actions`, (res) => {
-        res.on("data", () => {});
+        console.log(`[Compilation Debug] Status Code: ${res.statusCode}`);
+        let body = "";
+        res.on("data", (chunk) => {
+          body += chunk;
+        });
         res.on("end", () => {
-          console.log("Compilation triggered successfully.");
+          console.log(`[Compilation Debug] Response length: ${body.length}`);
+          if (res.statusCode !== 200) {
+            console.error(`[Compilation Error] Failed to compile /test-actions. Body: ${body.substring(0, 500)}`);
+          } else {
+            console.log("Compilation triggered successfully.");
+          }
           resolve();
         });
       });

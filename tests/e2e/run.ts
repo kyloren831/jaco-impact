@@ -1,15 +1,39 @@
-import { DevServerManager } from "./helpers/runner";
-import { resetAndSeed } from "./helpers/db";
 import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 
 async function main() {
   console.log("=== STARTING E2E TEST SUITE ORCHESTRATION ===");
+  
+  // Load environment variables from .env.local or .env
+  const envPath = fs.existsSync(".env.local") ? ".env.local" : (fs.existsSync(".env") ? ".env" : null);
+  if (envPath) {
+    const envContent = fs.readFileSync(envPath, "utf8");
+    for (const line of envContent.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const match = trimmed.match(/^([^=]+)=(.*)$/);
+      if (match) {
+        const key = match[1].trim();
+        let val = match[2].trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (!process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+  }
+
   (process.env as any).NODE_ENV = "test";
   process.env.MOCK_S3 = "true";
 
-  let devServer: DevServerManager | null = null;
+  // Dynamically import helpers so environment variables are loaded beforehand
+  const { DevServerManager } = await import("./helpers/runner");
+  const { resetAndSeed } = await import("./helpers/db");
+
+  let devServer: any = null;
   let exitCode = 0;
 
   try {
@@ -20,7 +44,8 @@ async function main() {
       fs.mkdirSync(tempDir, { recursive: true });
     }
 
-    const compilerPageContent = `import {
+    const compilerPageContent = `"use client";
+import {
   registerToEventAction,
   getVolunteerTasksAction,
   acceptAssignmentAction,
@@ -120,31 +145,35 @@ export default function TestActionsPage() {
       "tests/e2e/specs/tier4.spec.ts"
     ];
 
-    const testProc = spawn("npx", ["tsx", "--test", ...specFiles], {
-      stdio: "inherit",
-      env: {
-        ...process.env,
-        NODE_ENV: "test",
-        MOCK_S3: "true",
-        PORT: "3005",
-      },
-      shell: true,
-    });
+    for (const specFile of specFiles) {
+      console.log(`\n--- Running test suite: ${specFile} ---`);
+      const testProc = spawn("npx", ["tsx", "--test", specFile], {
+        stdio: "inherit",
+        env: {
+          ...process.env,
+          NODE_ENV: "test",
+          MOCK_S3: "true",
+          PORT: "3005",
+        },
+        shell: true,
+      });
 
-    await new Promise<void>((resolve, reject) => {
-      testProc.on("close", (code) => {
-        if (code !== 0) {
-          exitCode = code ?? 1;
-          console.error(`E2E tests failed with exit code ${code}`);
-        } else {
-          console.log("All E2E tests completed successfully!");
-        }
-        resolve();
+      const code = await new Promise<number | null>((resolve) => {
+        testProc.on("close", (code) => {
+          resolve(code);
+        });
       });
-      testProc.on("error", (err) => {
-        reject(err);
-      });
-    });
+
+      if (code !== 0) {
+        exitCode = code ?? 1;
+        console.error(`E2E test file ${specFile} failed with exit code ${code}`);
+        break; // Stop running further test files if one fails
+      }
+    }
+
+    if (exitCode === 0) {
+      console.log("All E2E tests completed successfully!");
+    }
 
   } catch (error) {
     console.error("Orchestrator error encountered:", error);

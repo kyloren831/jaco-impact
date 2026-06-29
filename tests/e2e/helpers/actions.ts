@@ -1,8 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-const manifestPath = path.resolve(process.cwd(), ".next/server/server-reference-manifest.json");
-
 function findActionIdInObj(obj: any, actionName: string): string | null {
   if (!obj || typeof obj !== "object") return null;
   if (obj.name === actionName && typeof obj.id === "string") {
@@ -15,13 +13,49 @@ function findActionIdInObj(obj: any, actionName: string): string | null {
   return null;
 }
 
+function findActionId(manifest: any, actionName: string): string | null {
+  for (const group of ["node", "edge"]) {
+    const actionsGroup = manifest[group];
+    if (actionsGroup && typeof actionsGroup === "object") {
+      for (const [actionId, actionData] of Object.entries(actionsGroup)) {
+        if (actionData && typeof actionData === "object") {
+          if (
+            (actionData as any).exportedName === actionName ||
+            (actionData as any).name === actionName
+          ) {
+            return actionId;
+          }
+          const workers = (actionData as any).workers;
+          if (workers && typeof workers === "object") {
+            for (const workerData of Object.values(workers)) {
+              if (workerData && typeof workerData === "object") {
+                if (
+                  (workerData as any).exportedName === actionName ||
+                  (workerData as any).name === actionName
+                ) {
+                  return (workerData as any).id || actionId;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return findActionIdInObj(manifest, actionName);
+}
+
 export function getActionId(actionName: string): string {
+  const devManifestPath = path.resolve(process.cwd(), ".next/dev/server/server-reference-manifest.json");
+  const prodManifestPath = path.resolve(process.cwd(), ".next/server/server-reference-manifest.json");
+  const manifestPath = fs.existsSync(devManifestPath) ? devManifestPath : prodManifestPath;
+
   if (!fs.existsSync(manifestPath)) {
     throw new Error(`server-reference-manifest.json not found at ${manifestPath}. Make sure next dev server is running and the compilation page has been loaded.`);
   }
   const content = fs.readFileSync(manifestPath, "utf8");
   const manifest = JSON.parse(content);
-  const actionId = findActionIdInObj(manifest, actionName);
+  const actionId = findActionId(manifest, actionName);
   if (!actionId) {
     throw new Error(`Action '${actionName}' not found in server-reference-manifest.json`);
   }
@@ -53,10 +87,33 @@ export async function executeAction(
     headers["Cookie"] = cookie;
   }
 
+  if (actionName === "submitEvidenceAction" && args.length === 1 && args[0] && typeof args[0] === "object" && typeof args[0].get === "function") {
+    const formData = args[0];
+    const taskIdStr = formData.get("taskId");
+    const file = formData.get("file");
+    const descriptionStr = formData.get("description");
+    if (taskIdStr && file) {
+      args[0] = {
+        taskId: parseInt(taskIdStr.toString(), 10),
+        description: descriptionStr ? descriptionStr.toString() : undefined,
+        file: {
+          name: file.name,
+          type: file.type,
+          size: file.size || 0,
+        }
+      };
+    }
+  }
+
+  console.log("[DEBUG executeAction] action:", actionName, "args length:", args.length, "args[0] type:", typeof args[0], "constructor:", args[0]?.constructor?.name);
   let body: any;
-  if (args.length === 1 && args[0] instanceof FormData) {
-    body = args[0];
-    // Let fetch handle boundary and multipart headers
+  if (args.length === 1 && args[0] && typeof args[0] === "object" && typeof args[0].append === "function") {
+    console.log("[DEBUG executeAction] serializing FormData");
+    const serializationResponse = new Response(args[0]);
+    const arrayBuffer = await serializationResponse.arrayBuffer();
+    body = Buffer.from(arrayBuffer);
+    console.log("[DEBUG executeAction] serialized body length:", body.length);
+    headers["Content-Type"] = serializationResponse.headers.get("content-type") || "";
   } else {
     headers["Content-Type"] = "text/plain;charset=UTF-8";
     body = JSON.stringify(args);

@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key');
 // We will use a default verified sender email. For local development, Resend requires you to use a verified domain or 'onboarding@resend.dev'.
 // Jaco Impact probably has a domain, but we can default to onboarding@resend.dev if missing.
 const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';

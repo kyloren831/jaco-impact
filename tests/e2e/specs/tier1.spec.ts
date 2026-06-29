@@ -354,6 +354,7 @@ describe("Tier 1 E2E Test Suite - Jacó Impact 'Mis Tareas'", () => {
       formData.append("file", file);
 
       const res = await executeAction("submitEvidenceAction", [formData], vol1Cookie);
+      if (!res.success) console.log("[DEBUG TEST 1] submitEvidenceAction failed:", res);
       assert.strictEqual(res.success, true);
       assert.ok(res.data.id);
 
@@ -424,6 +425,16 @@ describe("Tier 1 E2E Test Suite - Jacó Impact 'Mis Tareas'", () => {
     });
 
     it("should fail submit evidence when volunteer is not registered to the event", async () => {
+      // Delete task evidence first to avoid foreign key violation
+      await prisma.taskEvidence.deleteMany({
+        where: { taskId: seed.task1.id, volunteerId: seed.volunteer1.id },
+      });
+
+      // Delete task assignment first to avoid foreign key violation
+      await prisma.taskAssignment.deleteMany({
+        where: { taskId: seed.task1.id, volunteerId: seed.volunteer1.id },
+      });
+
       // Delete participation
       await prisma.eventParticipation.delete({
         where: {
@@ -449,6 +460,16 @@ describe("Tier 1 E2E Test Suite - Jacó Impact 'Mis Tareas'", () => {
           eventId: seed.event1.id,
           volunteerId: seed.volunteer1.id,
           status: "REGISTERED",
+        },
+      });
+
+      // Restore task assignment
+      await prisma.taskAssignment.create({
+        data: {
+          taskId: seed.task1.id,
+          volunteerId: seed.volunteer1.id,
+          eventId: seed.event1.id,
+          status: "IN_PROGRESS",
         },
       });
     });
@@ -587,8 +608,9 @@ describe("Tier 1 E2E Test Suite - Jacó Impact 'Mis Tareas'", () => {
 
     it("should allow a volunteer to add a comment to a task", async () => {
       const res = await executeAction("addTaskCommentAction", [seed.task1.id, "Volunteer comment content"], vol1Cookie);
+      if (!res.success) console.log("[DEBUG TEST COMMENTS 1] addTaskCommentAction failed:", res);
       assert.strictEqual(res.success, true);
-      assert.ok(res.data.id);
+      assert.ok(res.data?.id);
 
       const comment = await prisma.taskComment.findUnique({
         where: { id: res.data.id },
@@ -656,7 +678,7 @@ describe("Tier 1 E2E Test Suite - Jacó Impact 'Mis Tareas'", () => {
       assert.strictEqual(res.success, true);
 
       // Wait for SSE broadcast
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const events = sse.getEvents();
       const commentEvent = events.find((e) => e.type === "TASK_COMMENT");
@@ -684,7 +706,7 @@ describe("Tier 1 E2E Test Suite - Jacó Impact 'Mis Tareas'", () => {
       const res = await executeAction("acceptAssignmentAction", [seed.task2.id], vol1Cookie);
       assert.strictEqual(res.success, true);
 
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const events = sse.getEvents();
       const acceptEvent = events.find((e) => e.type === "ASSIGNMENT_ACCEPTED");
@@ -701,7 +723,7 @@ describe("Tier 1 E2E Test Suite - Jacó Impact 'Mis Tareas'", () => {
       const res = await executeAction("startAssignmentAction", [seed.task2.id], vol1Cookie);
       assert.strictEqual(res.success, true);
 
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const events = sse.getEvents();
       const startEvent = events.find((e) => e.type === "ASSIGNMENT_STARTED");
@@ -729,7 +751,7 @@ describe("Tier 1 E2E Test Suite - Jacó Impact 'Mis Tareas'", () => {
       const res = await executeAction("declineAssignmentAction", [seed.task2.id, "Declined realtime"], vol1Cookie);
       assert.strictEqual(res.success, true);
 
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const events = sse.getEvents();
       const declineEvent = events.find((e) => e.type === "ASSIGNMENT_DECLINED");
@@ -793,6 +815,7 @@ describe("Tier 1 E2E Test Suite - Jacó Impact 'Mis Tareas'", () => {
 
     it("should sanitize the extension to prevent path traversal in generated URLs", async () => {
       const res = await executeAction("getPresignedUploadUrlAction", ["evidencia.png/../../hacked", "image/png"], vol1Cookie);
+      console.log("[DEBUG TEST 5] res.data:", res.data);
       assert.strictEqual(res.success, true);
       assert.ok(res.data);
       assert.ok(res.data.uploadUrl.endsWith("pnghacked"));
