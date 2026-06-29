@@ -59,6 +59,13 @@ export type NotificationCreatedPayload = {
   title: string;
 };
 
+export type UserRegisteredPayload = {
+  userId: number;
+  email: string;
+  name: string;
+  role: string;
+};
+
 export type TaskCommentPayload = {
   taskId: number;
   commentId: number;
@@ -79,6 +86,9 @@ export const DOMAIN_EVENTS = {
   EVENT_STATUS_CHANGED: 'EVENT_STATUS_CHANGED',
   EVENT_CANCELLED: 'EVENT_CANCELLED',
   EVENT_UPDATED: 'EVENT_UPDATED',
+
+  // Users domain
+  USER_REGISTERED: 'USER_REGISTERED',
 
   // Participation domain
   VOLUNTEER_REGISTERED: 'VOLUNTEER_REGISTERED',

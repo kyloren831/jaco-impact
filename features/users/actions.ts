@@ -85,7 +85,7 @@ export async function createUser(data: { name: string; email: string; password?:
 
     const hashedPassword = await bcrypt.hash(data.password || "JacoImpact2026!", 10);
 
-    await prisma.user.create({
+    const created = await prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
@@ -97,6 +97,19 @@ export async function createUser(data: { name: string; email: string; password?:
           },
         },
       },
+    });
+
+    const { domainEventBus } = await import('@/domain/shared/domain-event-bus');
+    const { DOMAIN_EVENTS } = await import('@/domain/shared/events');
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.USER_REGISTERED,
+      payload: {
+        userId: created.id,
+        email: created.email,
+        name: created.name,
+        role: data.role
+      },
+      metadata: { timestamp: new Date(), actorId: created.id, correlationId: `register-admin-${created.id}` }
     });
 
     revalidatePath("/dashboard/admin/users");

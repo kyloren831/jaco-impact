@@ -61,6 +61,19 @@ export async function POST(request: Request) {
 
     const { password: _, ...userWithoutPassword } = createdUser;
 
+    const { domainEventBus } = await import('@/domain/shared/domain-event-bus');
+    const { DOMAIN_EVENTS } = await import('@/domain/shared/events');
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.USER_REGISTERED,
+      payload: {
+        userId: createdUser.id,
+        email: createdUser.email,
+        name: createdUser.name,
+        role: "VOLUNTEER"
+      },
+      metadata: { timestamp: new Date(), actorId: createdUser.id, correlationId: `register-${createdUser.id}` }
+    });
+
     return NextResponse.json(
       {
         message: "Registro exitoso. Se ha creado el usuario, su rol y su perfil de voluntario.",

@@ -1,5 +1,6 @@
 import { initializeAuditListeners } from '../audit/service';
 import { registerNotificationHandlers } from '../notifications/events';
+import { registerEmailHandlers } from '../emails/events';
 
 let isInitialized = false;
 
@@ -9,4 +10,5 @@ export function initializeDomainEvents() {
   
   initializeAuditListeners();
   registerNotificationHandlers();
+  registerEmailHandlers();
 }
