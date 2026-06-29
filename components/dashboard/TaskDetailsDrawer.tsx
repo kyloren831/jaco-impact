@@ -16,6 +16,43 @@ interface CommentDisplay {
   authorName: string;
 }
 
+export interface ActionPayload {
+  reason?: string;
+  file?: File;
+  note?: string;
+}
+
+export interface TaskAssignment {
+  volunteerId: number;
+  status: string;
+  declineReason?: string | null;
+}
+
+export interface TaskEvent {
+  name?: string;
+  title?: string;
+}
+
+export interface TaskData {
+  id?: number;
+  title: string;
+  description?: string | null;
+  priority: string;
+  dueDate?: string | Date | null;
+  event?: TaskEvent | null;
+  assignments?: TaskAssignment[];
+}
+
+export interface CommentData {
+  id: number;
+  content: string;
+  createdAt: string | Date;
+  authorId: number;
+  author?: {
+    name?: string;
+  };
+}
+
 interface TaskDetailsDrawerProps {
   taskId: number;
   volunteerId: number;
@@ -24,9 +61,9 @@ interface TaskDetailsDrawerProps {
   onClose: () => void;
   onAction: (
     action: "ACCEPT" | "DECLINE" | "START" | "SUBMIT" | "SUBMIT_WITH_FILE",
-    payload?: any
+    payload?: ActionPayload
   ) => Promise<void>;
-  task: any;
+  task: TaskData;
 }
 
 export default function TaskDetailsDrawer({
@@ -59,7 +96,7 @@ export default function TaskDetailsDrawer({
 
   const commentsEndRef = useRef<HTMLDivElement>(null);
 
-  const assignment = task.assignments?.find((a: any) => a.volunteerId === volunteerId);
+  const assignment = task.assignments?.find((a: TaskAssignment) => a.volunteerId === volunteerId);
   const status = assignment?.status;
 
   // Load comments on mount/taskId change
@@ -71,7 +108,7 @@ export default function TaskDetailsDrawer({
         const result = await getTaskCommentsAction(taskId);
         if (result.success && result.data) {
           setComments(
-            result.data.map((c: any) => ({
+            result.data.map((c: CommentData) => ({
               id: c.id,
               content: c.content,
               createdAt: c.createdAt,
@@ -82,8 +119,8 @@ export default function TaskDetailsDrawer({
         } else if (result.error) {
           setError(result.error);
         }
-      } catch (err: any) {
-        setError(err.message || "Error al cargar comentarios");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Error al cargar comentarios");
       } finally {
         setIsLoadingComments(false);
       }
@@ -165,8 +202,8 @@ export default function TaskDetailsDrawer({
         } else {
           router.refresh();
         }
-      } catch (err: any) {
-        setError(err.message || "Error al enviar comentario");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Error al enviar comentario");
       }
     });
   };
@@ -198,7 +235,7 @@ export default function TaskDetailsDrawer({
 
   const executeDrawerAction = async (
     action: "ACCEPT" | "DECLINE" | "START" | "SUBMIT" | "SUBMIT_WITH_FILE",
-    payload?: any
+    payload?: ActionPayload
   ) => {
     setIsSubmittingAction(true);
     setError("");
@@ -210,15 +247,16 @@ export default function TaskDetailsDrawer({
       }
       setSelectedFile(null);
       setNote("");
-    } catch (err: any) {
-      setError(err.message || "Ocurrió un error inesperado al procesar la acción.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Ocurrió un error inesperado al procesar la acción.");
     } finally {
       setIsSubmittingAction(false);
     }
   };
 
   // Status badges styling
-  const getStatusBadge = (statusValue: string) => {
+  const getStatusBadge = (statusValue?: string) => {
+    if (!statusValue) return null;
     switch (statusValue) {
       case "PENDING_ACCEPTANCE":
         return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 dark:bg-yellow-950/30 dark:text-yellow-400">Aceptación Pendiente</span>;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from 'next/image';
 import { getMyPymeAction, upsertMyPymeAction, addProductAction, deleteProductAction } from "@/features/pymes/actions";
 import { toast } from "sonner";
 import { Store, Plus, Trash2, Edit2, AlertTriangle, Image as ImageIcon } from "lucide-react";
@@ -32,6 +33,7 @@ export default function PymeDashboardPage() {
 
   const handleUpsertPyme = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get("name") as string,
@@ -48,11 +50,13 @@ export default function PymeDashboardPage() {
       fetchPyme();
     } catch (e: any) {
       toast.error("Error al guardar: " + e.message);
+      setLoading(false);
     }
   };
 
   const handleAddProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData(e.currentTarget);
 
     try {
@@ -62,6 +66,7 @@ export default function PymeDashboardPage() {
       fetchPyme();
     } catch (e: any) {
       toast.error("Error al agregar producto: " + e.message);
+      setLoading(false);
     }
   };
 
@@ -76,7 +81,7 @@ export default function PymeDashboardPage() {
     }
   };
 
-  if (loading) {
+  if (loading && !pyme && !isAddingProduct && !isEditingPyme) {
     return <div className="p-8 flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-verde"></div></div>;
   }
 
@@ -149,8 +154,8 @@ export default function PymeDashboardPage() {
                   Cancelar
                 </button>
               )}
-              <button type="submit" className="px-5 py-2 bg-brand-verde hover:bg-brand-verde/90 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
-                Guardar Perfil
+              <button type="submit" disabled={loading} className="px-5 py-2 bg-brand-verde hover:bg-brand-verde/90 disabled:opacity-50 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
+                {loading ? "Guardando..." : "Guardar Perfil"}
               </button>
             </div>
           </form>
@@ -212,10 +217,11 @@ export default function PymeDashboardPage() {
                     <div key={product.id} className="group relative bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex flex-col transition-all hover:shadow-md">
                       <div className="aspect-video bg-gray-200 dark:bg-gray-800 relative">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={product.imageUrl || 'https://placehold.co/400x300?text=No+Image'} alt={product.name} className="w-full h-full object-cover" />
+                        <Image src={product.imageUrl || 'https://placehold.co/400x300?text=No+Image'} alt={product.name} width={400} height={300} className="w-full h-full object-cover" />
                         <button 
                           onClick={() => handleDeleteProduct(product.id)}
-                          className="absolute top-2 right-2 p-1.5 bg-white/90 dark:bg-gray-900/90 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/50 dark:hover:text-red-400 text-gray-600 dark:text-gray-300 rounded-md shadow-sm opacity-0 group-hover:opacity-100 transition-all"
+                          disabled={loading}
+                          className="absolute top-2 right-2 p-1.5 bg-white/90 dark:bg-gray-900/90 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/50 dark:hover:text-red-400 text-gray-600 dark:text-gray-300 rounded-md shadow-sm opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -258,6 +264,11 @@ export default function PymeDashboardPage() {
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
             <textarea required name="description" rows={3} className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 px-3 py-2 text-sm focus:ring-brand-verde focus:border-brand-verde"></textarea>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <button type="submit" disabled={loading} className="px-5 py-2 bg-brand-verde hover:bg-brand-verde/90 disabled:opacity-50 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
+              {loading ? "Guardando..." : "Guardar Producto"}
+            </button>
           </div>
         </FormModal>
       )}

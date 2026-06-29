@@ -40,8 +40,13 @@ export async function uploadFileToR2(file: File, folder: string): Promise<string
     throw new Error("Storage configuration is missing. Verifica R2_BUCKET_NAME y NEXT_PUBLIC_R2_DEV_URL en .env.local");
   }
 
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
+  // Validation
+  if (file.size > 50 * 1024 * 1024) {
+    throw new Error("File size exceeds limit");
+  }
+
+  // Use stream instead of loading entirely into memory
+  const stream = file.stream();
 
   // Generate unique filename to avoid collisions
   const extension = file.name.split('.').pop() || 'png';
@@ -54,8 +59,9 @@ export async function uploadFileToR2(file: File, folder: string): Promise<string
   const command = new PutObjectCommand({
     Bucket: bucketName,
     Key: key,
-    Body: buffer,
+    Body: stream as any,
     ContentType: file.type,
+    ContentLength: file.size,
   });
 
   await s3Client.send(command);

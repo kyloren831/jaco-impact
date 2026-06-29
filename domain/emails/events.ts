@@ -1,10 +1,10 @@
 import { domainEventBus } from '../shared/domain-event-bus';
 import { DOMAIN_EVENTS, UserRegisteredPayload, AssignmentStatusChangedPayload, EventStatusChangedPayload, TaskAssignedPayload } from '../shared/events';
-import { sendEmail } from '@/infrastructure/emails/resend';
+
 import { prisma } from '@/lib/prisma';
 import { AssignmentStatus, EventStatus } from '@/generated/prisma/client';
 
-export function registerEmailHandlers() {
+export function registerEmailHandlers(sendEmail: (opts: any) => Promise<any>) {
   
   // 1. User registration successful -> notify user & director
   domainEventBus.on(DOMAIN_EVENTS.USER_REGISTERED, async (event) => {

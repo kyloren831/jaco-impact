@@ -8,7 +8,7 @@ export class CommentService {
       throw new Error("El comentario no puede estar vacío");
     }
 
-    return withTransaction(async (tx) => {
+    const result = await withTransaction(async (tx) => {
       // 1. Verify task exists
       const task = await tx.task.findUniqueOrThrow({
         where: { id: taskId },
@@ -34,23 +34,25 @@ export class CommentService {
         }
       });
 
-      // 3. Emit Domain Event
-      await domainEventBus.emit({
-        metadata: { timestamp: new Date(), actorId: authorId },
-        type: DOMAIN_EVENTS.TASK_COMMENT,
-        payload: {
-          taskId,
-          commentId: comment.id,
-          authorId,
-          content: comment.content,
-          createdAt: comment.createdAt,
-          authorName: comment.author.name,
-          eventId: task.eventId,
-        }
-      });
-
-      return comment;
+      return { comment, eventId: task.eventId };
     });
+
+    // 3. Emit Domain Event
+    await domainEventBus.emit({
+      metadata: { timestamp: new Date(), actorId: authorId },
+      type: DOMAIN_EVENTS.TASK_COMMENT,
+      payload: {
+        taskId,
+        commentId: result.comment.id,
+        authorId,
+        content: result.comment.content,
+        createdAt: result.comment.createdAt,
+        authorName: result.comment.author.name,
+        eventId: result.eventId,
+      }
+    });
+
+    return result.comment;
   }
 
   async getCommentsByTaskId(taskId: number) {

@@ -58,7 +58,7 @@ export async function requireRole(allowedRoles: string | string[]): Promise<Acce
 export async function requireOwnership(resourceOwnerId: number | string): Promise<AccessTokenPayload> {
   const payload = await requireAuth();
   
-  if (String(payload.id) !== String(resourceOwnerId)) {
+  if (String(payload.userId) !== String(resourceOwnerId)) {
     throw new AuthError("FORBIDDEN", "No tienes permisos para modificar este recurso");
   }
   

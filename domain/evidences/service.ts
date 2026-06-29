@@ -55,7 +55,7 @@ export class EvidenceService {
     const fileUrl = await uploadFileToR2(file, 'evidences');
     const fileType = getFileType(file.type);
 
-    return withTransaction(async (tx) => {
+    const result = await withTransaction(async (tx) => {
       // 1. Create Evidence
       const evidence = await tx.taskEvidence.create({
         data: {
@@ -81,43 +81,45 @@ export class EvidenceService {
         }
       });
 
-      await domainEventBus.emit({
-        type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
-        payload: {
-          taskId,
-          volunteerId,
-          eventId: assignment.eventId,
-          actorId,
-          previousStatus: assignment.status,
-          newStatus
-        },
-        metadata: {
-          actorId,
-          timestamp: new Date()
-        }
-      });
-
       // Recalculate parent Task status atomically
       await assignmentService.checkAndDeriveTaskStatus(taskId, tx, actorId);
 
-      // 3. Emit Domain Event
-      await domainEventBus.emit({
-        type: 'EVIDENCE_SUBMITTED',
-        payload: {
-          evidenceId: evidence.id,
-          taskId: evidence.taskId,
-          volunteerId: evidence.volunteerId,
-          eventId: assignment.eventId,
-          fileType: evidence.fileType,
-        },
-        metadata: {
-          actorId,
-          timestamp: new Date()
-        }
-      });
-
       return evidence;
     });
+
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
+      payload: {
+        taskId,
+        volunteerId,
+        eventId: assignment.eventId,
+        actorId,
+        previousStatus: assignment.status,
+        newStatus
+      },
+      metadata: {
+        actorId,
+        timestamp: new Date()
+      }
+    });
+
+    // 3. Emit Domain Event
+    await domainEventBus.emit({
+      type: 'EVIDENCE_SUBMITTED',
+      payload: {
+        evidenceId: result.id,
+        taskId: result.taskId,
+        volunteerId: result.volunteerId,
+        eventId: assignment.eventId,
+        fileType: result.fileType,
+      },
+      metadata: {
+        actorId,
+        timestamp: new Date()
+      }
+    });
+
+    return result;
   }
 
   /**
@@ -135,7 +137,7 @@ export class EvidenceService {
       throw new Error(`Evidence ${evidenceId} not found`);
     }
 
-    return withTransaction(async (tx) => {
+    const result = await withTransaction(async (tx) => {
       let currentStatus = existing.assignment.status;
       if (currentStatus === AssignmentStatus.SUBMITTED) {
         currentStatus = assignmentStateMachine.transition(currentStatus, AssignmentStatus.UNDER_REVIEW);
@@ -167,47 +169,48 @@ export class EvidenceService {
         }
       });
 
-      await domainEventBus.emit({
-        type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
-        payload: {
-          taskId: evidence.taskId,
-          volunteerId: evidence.volunteerId,
-          eventId: existing.assignment.eventId,
-          actorId: reviewerId,
-          previousStatus: existing.assignment.status,
-          newStatus: derivedStatus
-        },
-        metadata: {
-          actorId: reviewerId,
-          timestamp: new Date()
-        }
-      });
-
       // Recalculate parent Task status atomically
       await assignmentService.checkAndDeriveTaskStatus(evidence.taskId, tx, reviewerId);
-
-      // 3. Emit Domain Event
       const eventType = status === 'APPROVED' ? 'EVIDENCE_APPROVED' : 'EVIDENCE_REJECTED';
-      
-      await domainEventBus.emit({
-        type: eventType,
-        payload: {
-          evidenceId: evidence.id,
-          taskId: evidence.taskId,
-          volunteerId: evidence.volunteerId,
-          eventId: existing.assignment.eventId,
-          decision: status,
-          reviewedBy: reviewerId,
-          reviewNote: reviewNote
-        },
-        metadata: {
-          actorId: reviewerId,
-          timestamp: new Date()
-        }
-      });
 
-      return evidence;
+      return { evidence, existing, derivedStatus, eventType };
     });
+
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
+      payload: {
+        taskId: result.evidence.taskId,
+        volunteerId: result.evidence.volunteerId,
+        eventId: result.existing.assignment.eventId,
+        actorId: reviewerId,
+        previousStatus: result.existing.assignment.status,
+        newStatus: result.derivedStatus
+      },
+      metadata: {
+        actorId: reviewerId,
+        timestamp: new Date()
+      }
+    });
+
+    // 3. Emit Domain Event
+    await domainEventBus.emit({
+      type: result.eventType,
+      payload: {
+        evidenceId: result.evidence.id,
+        taskId: result.evidence.taskId,
+        volunteerId: result.evidence.volunteerId,
+        eventId: result.existing.assignment.eventId,
+        decision: status,
+        reviewedBy: reviewerId,
+        reviewNote: reviewNote
+      },
+      metadata: {
+        actorId: reviewerId,
+        timestamp: new Date()
+      }
+    });
+
+    return result.evidence;
   }
 }
 

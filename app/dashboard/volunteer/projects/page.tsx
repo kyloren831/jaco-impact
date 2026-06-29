@@ -1,4 +1,5 @@
 import { getVolunteerProjectsAction } from "@/features/volunteer/actions";
+import Image from 'next/image';
 import Link from "next/link";
 
 export default async function VolunteerProjectsPage() {
@@ -26,7 +27,7 @@ export default async function VolunteerProjectsPage() {
           {projects.map((project: any) => (
             <div key={project.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col">
               {project.photoUrl ? (
-                <img src={project.photoUrl} alt={project.name} className="w-full h-48 object-cover" />
+                <Image src={project.photoUrl} alt={project.name} width={400} height={300} className="w-full h-48 object-cover" />
               ) : (
                 <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400">
                   Sin Imagen

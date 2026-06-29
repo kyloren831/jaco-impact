@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { MessageCircle, Tag, Store, Search } from 'lucide-react';
+import Image from 'next/image';
 
 interface Product {
   id: number;
@@ -106,11 +107,12 @@ export default function ProductosSection({ pymes }: ProductosSectionProps) {
             return (
               <div key={`${product.pymeId}-${product.id}`} className="bg-gray-900/50 backdrop-blur-sm rounded-2xl shadow-sm border border-white/10 overflow-hidden flex flex-col group hover:shadow-lg hover:shadow-brand-verde/5 hover:border-brand-verde/30 transition-all">
                 <div className="aspect-square bg-gray-800 overflow-hidden relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
+                  <Image 
                     src={product.imageUrl} 
                     alt={product.name} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                   />
                   <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-white border border-white/10 flex items-center">
                     <Store className="w-3 h-3 mr-1.5 text-brand-verde" />

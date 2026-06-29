@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 type PublicPillar = {
   id: number;
@@ -41,7 +42,7 @@ export default function PilaresSection({ pilares }: { pilares: PublicPillar[] })
                 style={{ backgroundColor: pilar.color + "20", color: pilar.color }}
               >
                 {(pilar.iconUrl?.startsWith('http') || pilar.iconUrl?.startsWith('/') || pilar.iconUrl?.startsWith('data:image')) ? (
-                  <img src={pilar.iconUrl} alt={pilar.name} className="w-full h-full object-contain p-3 drop-shadow-sm" />
+                  <Image src={pilar.iconUrl} alt={pilar.name} width={400} height={300} className="w-full h-full object-contain p-3 drop-shadow-sm" />
                 ) : (
                   pilar.iconUrl || <span style={{ color: pilar.color }}>{pilar.name.charAt(0)}</span>
                 )}

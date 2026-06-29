@@ -40,10 +40,11 @@ export default function SubmitEvidenceModal({ taskId }: { taskId: number }) {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h3 className="text-lg font-bold text-gray-900">Subir Evidencia de Tarea</h3>
+              <h3 id="modal-title" className="text-lg font-bold text-gray-900">Subir Evidencia de Tarea</h3>
               <button
+                aria-label="Cerrar"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >

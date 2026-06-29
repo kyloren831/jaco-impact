@@ -126,27 +126,27 @@ enum ActorType {
 //--------------------------------------------------
 //Schema (Tablas de la bd)
 model User {
-  id               Int            @id @default(autoincrement())
-  name             String         @db.VarChar(100)
-  email            String         @unique @db.VarChar(150)
-  password         String         @db.VarChar(255)
-  imageUrl         String?        @db.VarChar(255)
-  isActive         Boolean
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  userRoles        UserRole[]
-  volunteers       Volunteer?
-  pillar           Pillar?
-  projects         Project[]
-  events           Event[]
-  tasks            Task[]
-  evidenceReviewed TaskEvidence[]
-  pyme             PymeManager?
-  posts            BlogPost[]
-  sessions         Session[]
-  notifications    Notification[]
-  activityLogs     ActivityLog[]  @relation("ActorLogs")
-  taskComments     TaskComment[]
+  id                  Int                  @id @default(autoincrement())
+  name                String               @db.VarChar(100)
+  email               String               @unique @db.VarChar(150)
+  password            String               @db.VarChar(255)
+  imageUrl            String?              @db.VarChar(255)
+  isActive            Boolean
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  userRoles           UserRole[]
+  volunteers          Volunteer?
+  pillar              Pillar?
+  projects            Project[]
+  events              Event[]
+  tasks               Task[]
+  evidenceReviewed    TaskEvidence[]
+  pyme                PymeManager?
+  posts               BlogPost[]
+  sessions            Session[]
+  notifications       Notification[]
+  activityLogs        ActivityLog[]        @relation("ActorLogs")
+  taskComments        TaskComment[]
   passwordResetTokens PasswordResetToken[]
 
   @@map("users")
@@ -165,7 +165,7 @@ model UserRole {
 model Session {
   id          Int      @id @default(autoincrement())
   userId      Int
-  refreshHash String
+  refreshHash String   @unique
   userAgent   String?
   ip          String?
   revoked     Boolean  @default(false)
@@ -174,6 +174,7 @@ model Session {
   user        User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
+  @@index([refreshHash])
   @@map("sessions")
 }
 
@@ -189,6 +190,7 @@ model Pillar {
   projects      Project[]
   news          News[]
 
+  @@index([isActive])
   @@index([coordinatorId])
   @@map("pillars")
 }
@@ -263,6 +265,7 @@ model Project {
   reviews     ProjectReview[]
   news        News[]
 
+  @@index([status, visibility])
   @@index([pillarId])
   @@index([createdBy])
   @@map("projects")
@@ -290,6 +293,7 @@ model Event {
   participations   EventParticipation[]
   news             News[]
 
+  @@index([status, visibility])
   @@index([projectId])
   @@index([createdBy])
   @@map("events")
@@ -414,6 +418,7 @@ model ProjectReview {
   project     Project   @relation(fields: [projectId], references: [id])
   volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
 
+  @@unique([projectId, volunteerId])
   @@index([projectId])
   @@index([volunteerId])
   @@map("projects_reviews")
@@ -436,6 +441,7 @@ model Pyme {
   manager       PymeManager?
   products      Product[]
 
+  @@index([isActive])
   @@map("pymes")
 }
 
@@ -465,6 +471,7 @@ model Product {
   createdAt   DateTime  @default(now())
   pyme        Pyme      @relation(fields: [pymeId], references: [id])
 
+  @@index([isActive])
   @@index([pymeId])
   @@map("products")
 }
@@ -525,14 +532,13 @@ model Notification {
 
   user User @relation(fields: [userId], references: [id])
 
-  @@index([userId])
-  @@index([isRead])
+  @@index([userId, isRead])
   @@map("notifications")
 }
 
 model ActivityLog {
   id            Int            @id @default(autoincrement())
-  actorId       Int
+  actorId       Int?
   actorType     ActorType
   action        ActivityAction
   entityType    String         @db.VarChar(50)
@@ -542,7 +548,7 @@ model ActivityLog {
   newState      Json?
   createdAt     DateTime       @default(now())
 
-  actor User @relation("ActorLogs", fields: [actorId], references: [id])
+  actor User? @relation("ActorLogs", fields: [actorId], references: [id])
 
   @@index([entityType, entityId])
   @@index([eventId, createdAt])

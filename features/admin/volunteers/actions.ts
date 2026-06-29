@@ -21,7 +21,8 @@ export async function getVolunteersListAction() {
           }
         }
       },
-      orderBy: { name: "asc" }
+      orderBy: { name: "asc" },
+      take: 50
     });
     return { success: true, data: volunteers };
   } catch (error: any) {

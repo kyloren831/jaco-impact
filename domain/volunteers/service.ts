@@ -26,8 +26,8 @@ export class VolunteerDomainService {
     });
   }
 
-  async getAllVolunteers() {
-    return this.repository.findAll();
+  async getAllVolunteers(take?: number) {
+    return this.repository.findAll(undefined, take);
   }
 }
 

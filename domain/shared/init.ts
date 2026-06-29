@@ -1,6 +1,7 @@
 import { initializeAuditListeners } from '../audit/service';
 import { registerNotificationHandlers } from '../notifications/events';
 import { registerEmailHandlers } from '../emails/events';
+import { sendEmail } from '@/infrastructure/emails/resend';
 
 let isInitialized = false;
 
@@ -10,5 +11,5 @@ export function initializeDomainEvents() {
   
   initializeAuditListeners();
   registerNotificationHandlers();
-  registerEmailHandlers();
+  registerEmailHandlers(sendEmail);
 }

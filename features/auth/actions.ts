@@ -8,6 +8,7 @@ import { setAuthCookies } from "@/lib/auth/cookies";
 import { createSession } from "@/lib/auth/session";
 import { LoginUserSchema } from "@/lib/validators";
 import crypto from "crypto";
+import { z } from "zod";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth/guards";
@@ -90,22 +91,39 @@ export async function loginAction(prevState: any, formData: FormData) {
   redirect("/dashboard");
 }
 
+const RegisterSchema = z.object({
+  name: z.string().min(1, "El nombre es requerido"),
+  email: z.string().email("Email inválido"),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+  phone: z.string().regex(/^\+?[0-9\s\-\(\)]{8,}$/, "El teléfono no tiene un formato válido"),
+  nationality: z.string().min(1, "La nacionalidad es requerida"),
+  profession: z.string().optional(),
+  emergencyContactName: z.string().optional(),
+  emergencyContactPhone: z.string().optional(),
+  inmediateAvailability: z.string().optional(),
+});
+
 export async function registerAction(prevState: any, formData: FormData) {
   try {
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const phone = formData.get("phone") as string;
-    const nationality = formData.get("nationality") as string;
+    const rawData = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+      phone: formData.get("phone") as string,
+      nationality: formData.get("nationality") as string,
+      profession: formData.get("profession") as string,
+      emergencyContactName: formData.get("emergencyContactName") as string,
+      emergencyContactPhone: formData.get("emergencyContactPhone") as string,
+      inmediateAvailability: formData.get("inmediateAvailability") as string,
+    };
 
-    if (!name || !email || !password || !phone || !nationality) {
-      return { success: false, error: "Faltan campos requeridos" };
+    const result = RegisterSchema.safeParse(rawData);
+
+    if (!result.success) {
+      return { success: false, error: result.error.errors[0]?.message || "Datos inválidos" };
     }
 
-    const phoneRegex = /^\+?[0-9\s\-\(\)]{8,}$/;
-    if (!phoneRegex.test(phone)) {
-      return { success: false, error: "El teléfono no tiene un formato válido" };
-    }
+    const { name, email, password, phone, nationality, profession, emergencyContactName, emergencyContactPhone, inmediateAvailability } = result.data;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -136,10 +154,10 @@ export async function registerAction(prevState: any, formData: FormData) {
           userId: user.id,
           phone,
           nationality,
-          profession: (formData.get("profession") as string) || "No especificado",
-          emergencyContactName: (formData.get("emergencyContactName") as string) || "No especificado",
-          emergencyContactPhone: (formData.get("emergencyContactPhone") as string) || "No especificado",
-          inmediateAvailability: formData.get("inmediateAvailability") === "true",
+          profession: profession || "No especificado",
+          emergencyContactName: emergencyContactName || "No especificado",
+          emergencyContactPhone: emergencyContactPhone || "No especificado",
+          inmediateAvailability: inmediateAvailability === "true",
         },
       });
     });

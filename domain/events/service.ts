@@ -1,5 +1,4 @@
 import { IEventRepository } from './event.repository';
-import { EventPrismaRepository } from '../../infrastructure/prisma/repositories/event.prisma-repository';
 import { CreateEventDTO, UpdateEventDTO } from './event.types';
 import { EventStatus, AssignmentStatus } from '../../generated/prisma/client';
 import { eventStateMachine } from './event.state-machine';
@@ -11,7 +10,7 @@ import { PaginationParams } from '../shared/types';
 import { Prisma } from '../../generated/prisma/client';
 
 export class EventDomainService {
-  constructor(private readonly repository: IEventRepository = new EventPrismaRepository()) {}
+  constructor(private readonly repository: IEventRepository) {}
 
   async getEventDetails(id: number) {
     return this.repository.findByIdWithParticipations(id);
@@ -26,7 +25,7 @@ export class EventDomainService {
   }
 
   async createEvent(data: CreateEventDTO, actorId: number) {
-    return withTransaction(async (tx) => {
+    const result = await withTransaction(async (tx) => {
       // Validate dates against project
       const project = await tx.project.findUnique({ where: { id: data.projectId } });
       if (project) {
@@ -44,22 +43,23 @@ export class EventDomainService {
       }
 
       // Create the event
-      const event = await (this.repository as EventPrismaRepository).create(data, actorId, tx);
-
-      // Emit EVENT_CREATED
-      await domainEventBus.emit({
-        type: DOMAIN_EVENTS.EVENT_CREATED,
-        payload: { eventId: event.id },
-        metadata: { actorId, timestamp: new Date(), correlationId: `create-event-${event.id}` }
-      });
-
+      const event = await this.repository.create(data, actorId, tx);
       return event;
     });
+
+    // Emit EVENT_CREATED
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.EVENT_CREATED,
+      payload: { eventId: result.id },
+      metadata: { actorId, timestamp: new Date(), correlationId: `create-event-${result.id}` }
+    });
+
+    return result;
   }
 
   async updateEventStatus(id: number, newStatus: EventStatus, actorId: number) {
-    return withTransaction(async (tx) => {
-      const event = await (this.repository as EventPrismaRepository).findById(id, tx);
+    const result = await withTransaction(async (tx) => {
+      const event = await this.repository.findById(id, tx);
       if (!event) {
         throw new EventNotFoundError(id);
       }
@@ -70,7 +70,7 @@ export class EventDomainService {
       eventStateMachine.transition(previousStatus, newStatus);
 
       // Update status
-      const updatedEvent = await (this.repository as EventPrismaRepository).updateStatus(id, newStatus, tx);
+      const updatedEvent = await this.repository.updateStatus(id, newStatus, tx);
 
       // If cancelled, cascade to task assignments
       if (newStatus === EventStatus.CANCELLED) {
@@ -89,53 +89,61 @@ export class EventDomainService {
             },
             data: { status: AssignmentStatus.CANCELLED }
           });
-
-          // Emit ASSIGNMENT_CANCELLED for each
-          for (const assignment of assignments) {
-            await domainEventBus.emit({
-              metadata: { timestamp: new Date(), actorId },
-              type: DOMAIN_EVENTS.ASSIGNMENT_CANCELLED,
-              payload: {
-                taskId: assignment.taskId,
-                volunteerId: assignment.volunteerId,
-                eventId: id,
-                actorId,
-                previousStatus: assignment.status,
-                newStatus: AssignmentStatus.CANCELLED
-              }
-            });
-          }
         }
       }
 
-      // Emit EVENT_STATUS_CHANGED
-      await domainEventBus.emit({
-        type: DOMAIN_EVENTS.EVENT_STATUS_CHANGED,
-        payload: {
-          eventId: updatedEvent.id,
-          previousStatus,
-          newStatus,
-          actorId,
-        },
-        metadata: { actorId, timestamp: new Date(), correlationId: `status-event-${updatedEvent.id}` }
-      });
-
-      // Emit EVENT_CANCELLED if transitioning to CANCELLED
-      if (newStatus === EventStatus.CANCELLED) {
-        await domainEventBus.emit({
-          type: DOMAIN_EVENTS.EVENT_CANCELLED,
-          payload: { eventId: updatedEvent.id, actorId },
-          metadata: { actorId, timestamp: new Date(), correlationId: `cancel-event-${updatedEvent.id}` }
-        });
-      }
-
-      return updatedEvent;
+      return { updatedEvent, previousStatus, assignmentsToCancel: newStatus === EventStatus.CANCELLED ? await tx.taskAssignment.findMany({
+          where: {
+            eventId: id,
+            status: { notIn: [AssignmentStatus.CANCELLED, AssignmentStatus.DECLINED] }
+          }
+        }) : [] };
     });
+
+    if (newStatus === EventStatus.CANCELLED && result.assignmentsToCancel.length > 0) {
+      await Promise.all(result.assignmentsToCancel.map(assignment => 
+        domainEventBus.emit({
+          metadata: { timestamp: new Date(), actorId },
+          type: DOMAIN_EVENTS.ASSIGNMENT_CANCELLED,
+          payload: {
+            taskId: assignment.taskId,
+            volunteerId: assignment.volunteerId,
+            eventId: id,
+            actorId,
+            previousStatus: assignment.status,
+            newStatus: AssignmentStatus.CANCELLED
+          }
+        })
+      ));
+    }
+
+    // Emit EVENT_STATUS_CHANGED
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.EVENT_STATUS_CHANGED,
+      payload: {
+        eventId: result.updatedEvent.id,
+        previousStatus: result.previousStatus,
+        newStatus,
+        actorId,
+      },
+      metadata: { actorId, timestamp: new Date(), correlationId: `status-event-${result.updatedEvent.id}` }
+    });
+
+    // Emit EVENT_CANCELLED if transitioning to CANCELLED
+    if (newStatus === EventStatus.CANCELLED) {
+      await domainEventBus.emit({
+        type: DOMAIN_EVENTS.EVENT_CANCELLED,
+        payload: { eventId: result.updatedEvent.id, actorId },
+        metadata: { actorId, timestamp: new Date(), correlationId: `cancel-event-${result.updatedEvent.id}` }
+      });
+    }
+
+    return result.updatedEvent;
   }
 
   async updateEventDetails(id: number, data: UpdateEventDTO, actorId: number) {
-    return withTransaction(async (tx) => {
-      const event = await (this.repository as EventPrismaRepository).findById(id, tx);
+    const result = await withTransaction(async (tx) => {
+      const event = await this.repository.findById(id, tx);
       if (!event) {
         throw new EventNotFoundError(id);
       }
@@ -160,16 +168,17 @@ export class EventDomainService {
         }
       }
 
-      const updatedEvent = await (this.repository as EventPrismaRepository).updateDetails(id, data, tx);
-
-      // Emit EVENT_UPDATED
-      await domainEventBus.emit({
-        type: DOMAIN_EVENTS.EVENT_UPDATED,
-        payload: { eventId: updatedEvent.id, actorId, updates: data },
-        metadata: { actorId, timestamp: new Date(), correlationId: `update-event-${updatedEvent.id}` }
-      });
-
+      const updatedEvent = await this.repository.updateDetails(id, data, tx);
       return updatedEvent;
     });
+
+    // Emit EVENT_UPDATED
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.EVENT_UPDATED,
+      payload: { eventId: result.id, actorId, updates: data },
+      metadata: { actorId, timestamp: new Date(), correlationId: `update-event-${result.id}` }
+    });
+
+    return result;
   }
 }

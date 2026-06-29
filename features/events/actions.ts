@@ -4,10 +4,11 @@ initializeDomainEvents();
 
 import { requireRole, withRole } from "@/lib/auth/guards";
 import { EventDomainService } from "@/domain/events/service";
+import { EventPrismaRepository } from "@/infrastructure/prisma/repositories/event.prisma-repository";
 import { EventStatus, Visibility } from "@/generated/prisma/client";
 import { CreateEventDTO, UpdateEventDTO } from "@/domain/events/event.types";
 
-const eventService = new EventDomainService();
+const eventService = new EventDomainService(new EventPrismaRepository());
 
 export async function getEventsByProject(projectId: number) {
   try {
@@ -20,7 +21,7 @@ export async function getEventsByProject(projectId: number) {
 
 export async function getAllEvents() {
   try {
-    const events = await eventService.getAllEvents();
+    const events = await eventService.getAllEvents({ pageSize: 50 });
     return { success: true, data: events.data };
   } catch (error: any) {
     return { success: false, error: error.message };
