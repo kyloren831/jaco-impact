@@ -47,6 +47,9 @@ export function RightSidePanel({
 
       {/* Slide Panel */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Panel lateral"
         className={`fixed inset-y-0 right-0 z-[100] ${width} bg-white dark:bg-gray-900 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}

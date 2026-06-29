@@ -3,7 +3,10 @@
 import { requireAuth, requireRole } from "@/lib/auth/guards";
 import { revalidatePath } from "next/cache";
 import { uploadFileToR2 } from "@/lib/storage/r2";
-import { projectDomainService } from "@/domain/projects/service";
+import { ProjectDomainService } from "@/domain/projects/service";
+import { ProjectPrismaRepository } from "@/infrastructure/prisma/repositories/project.prisma-repository";
+
+const projectDomainService = new ProjectDomainService(new ProjectPrismaRepository());
 import { DomainError } from "@/domain/shared/domain-error";
 
 export async function createProject(formData: FormData) {
@@ -64,7 +67,9 @@ export async function createProject(formData: FormData) {
 
     // Auth check
     if (!isAdmin) {
-      const { pillarDomainService } = await import("@/domain/pillars/service");
+      const { PillarDomainService } = await import("@/domain/pillars/service");
+      const { PillarPrismaRepository } = await import("@/infrastructure/prisma/repositories/pillar.prisma-repository");
+      const pillarDomainService = new PillarDomainService(new PillarPrismaRepository());
       const pillar = await pillarDomainService.getAllPillars().then(pillars => pillars.find(p => p.id === pillarId));
       if (!pillar) return { success: false, error: "El pilar no existe." };
       if (pillar.coordinatorId !== session.userId) {

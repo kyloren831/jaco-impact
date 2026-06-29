@@ -13,6 +13,7 @@ import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
   const dbPymes = await prisma.pyme.findMany({
+    take: 10,
     where: { isActive: true },
     include: {
       products: {
@@ -35,6 +36,7 @@ export default async function Home() {
   });
 
   const activeProjects = await prisma.project.findMany({
+    take: 10,
     where: { 
       status: { in: ['PUBLISHED', 'IN_PROGRESS'] },
       visibility: 'PUBLIC'

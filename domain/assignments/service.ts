@@ -7,7 +7,8 @@ import { AssignmentStatus, TaskStatus } from '../../generated/prisma/enums';
 
 export class AssignmentService {
   async assignTask(taskId: number, volunteerId: number, assignedBy: number, eventId?: number) {
-    return withTransaction(async (tx) => {
+    const eventsToEmit: any[] = [];
+    const assignment = await withTransaction(async (tx) => {
       let finalEventId = eventId;
       let taskTitle = "";
       let eventName = "";
@@ -25,6 +26,9 @@ export class AssignmentService {
           where: { id: taskId },
           include: { event: true }
         });
+        if (task.eventId !== finalEventId) {
+          throw new Error("El eventId proporcionado no coincide con el de la tarea.");
+        }
         taskTitle = task.title;
         eventName = task.event.name;
       }
@@ -63,9 +67,9 @@ export class AssignmentService {
       });
 
       // Recalculate parent Task status atomically
-      await this.checkAndDeriveTaskStatus(taskId, tx, assignedBy);
+      await this.checkAndDeriveTaskStatus(taskId, tx, assignedBy, eventsToEmit);
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId: assignedBy },
         type: DOMAIN_EVENTS.TASK_ASSIGNED,
         payload: {
@@ -80,25 +84,29 @@ export class AssignmentService {
 
       return assignment;
     });
+
+    for (const e of eventsToEmit) await domainEventBus.emit(e);
+    return assignment;
   }
 
   async acceptAssignment(taskId: number, volunteerId: number, actorId: number) {
-    return withTransaction(async (tx) => {
+    const eventsToEmit: any[] = [];
+    const updated = await withTransaction(async (tx) => {
       const current = await tx.taskAssignment.findUniqueOrThrow({
         where: { taskId_volunteerId: { taskId, volunteerId } }
       });
 
       const newStatus = assignmentStateMachine.transition(current.status, AssignmentStatus.ACCEPTED);
 
-      const updated = await tx.taskAssignment.update({
+      const updatedAssignment = await tx.taskAssignment.update({
         where: { taskId_volunteerId: { taskId, volunteerId } },
         data: { status: newStatus, acceptedAt: new Date() }
       });
 
       // Recalculate parent Task status atomically
-      await this.checkAndDeriveTaskStatus(taskId, tx, actorId);
+      await this.checkAndDeriveTaskStatus(taskId, tx, actorId, eventsToEmit);
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_ACCEPTED,
         payload: {
@@ -111,7 +119,7 @@ export class AssignmentService {
         }
       });
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
         payload: {
@@ -124,27 +132,31 @@ export class AssignmentService {
         }
       });
 
-      return updated;
+      return updatedAssignment;
     });
+
+    for (const e of eventsToEmit) await domainEventBus.emit(e);
+    return updated;
   }
 
   async declineAssignment(taskId: number, volunteerId: number, actorId: number, reason?: string) {
-    return withTransaction(async (tx) => {
+    const eventsToEmit: any[] = [];
+    const updated = await withTransaction(async (tx) => {
       const current = await tx.taskAssignment.findUniqueOrThrow({
         where: { taskId_volunteerId: { taskId, volunteerId } }
       });
 
       const newStatus = assignmentStateMachine.transition(current.status, AssignmentStatus.DECLINED);
 
-      const updated = await tx.taskAssignment.update({
+      const updatedAssignment = await tx.taskAssignment.update({
         where: { taskId_volunteerId: { taskId, volunteerId } },
         data: { status: newStatus, declinedAt: new Date(), declineReason: reason }
       });
 
       // Recalculate parent Task status atomically
-      await this.checkAndDeriveTaskStatus(taskId, tx, actorId);
+      await this.checkAndDeriveTaskStatus(taskId, tx, actorId, eventsToEmit);
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_DECLINED,
         payload: {
@@ -158,7 +170,7 @@ export class AssignmentService {
         }
       });
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
         payload: {
@@ -172,27 +184,31 @@ export class AssignmentService {
         }
       });
 
-      return updated;
+      return updatedAssignment;
     });
+
+    for (const e of eventsToEmit) await domainEventBus.emit(e);
+    return updated;
   }
 
   async startAssignment(taskId: number, volunteerId: number, actorId: number) {
-    return withTransaction(async (tx) => {
+    const eventsToEmit: any[] = [];
+    const updated = await withTransaction(async (tx) => {
       const current = await tx.taskAssignment.findUniqueOrThrow({
         where: { taskId_volunteerId: { taskId, volunteerId } }
       });
 
       const newStatus = assignmentStateMachine.transition(current.status, AssignmentStatus.IN_PROGRESS);
 
-      const updated = await tx.taskAssignment.update({
+      const updatedAssignment = await tx.taskAssignment.update({
         where: { taskId_volunteerId: { taskId, volunteerId } },
         data: { status: newStatus, startedAt: new Date() }
       });
 
       // Recalculate parent Task status atomically
-      await this.checkAndDeriveTaskStatus(taskId, tx, actorId);
+      await this.checkAndDeriveTaskStatus(taskId, tx, actorId, eventsToEmit);
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_STARTED,
         payload: {
@@ -205,7 +221,7 @@ export class AssignmentService {
         }
       });
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
         payload: {
@@ -218,27 +234,31 @@ export class AssignmentService {
         }
       });
 
-      return updated;
+      return updatedAssignment;
     });
+
+    for (const e of eventsToEmit) await domainEventBus.emit(e);
+    return updated;
   }
 
   async submitAssignment(taskId: number, volunteerId: number, actorId: number, note?: string) {
-    return withTransaction(async (tx) => {
+    const eventsToEmit: any[] = [];
+    const updated = await withTransaction(async (tx) => {
       const current = await tx.taskAssignment.findUniqueOrThrow({
         where: { taskId_volunteerId: { taskId, volunteerId } }
       });
 
       const newStatus = assignmentStateMachine.transition(current.status, AssignmentStatus.SUBMITTED);
 
-      const updated = await tx.taskAssignment.update({
+      const updatedAssignment = await tx.taskAssignment.update({
         where: { taskId_volunteerId: { taskId, volunteerId } },
         data: { status: newStatus, submittedAt: new Date(), completionNote: note }
       });
 
       // Recalculate parent Task status atomically
-      await this.checkAndDeriveTaskStatus(taskId, tx, actorId);
+      await this.checkAndDeriveTaskStatus(taskId, tx, actorId, eventsToEmit);
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_SUBMITTED,
         payload: {
@@ -251,7 +271,7 @@ export class AssignmentService {
         }
       });
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
         payload: {
@@ -264,12 +284,16 @@ export class AssignmentService {
         }
       });
 
-      return updated;
+      return updatedAssignment;
     });
+
+    for (const e of eventsToEmit) await domainEventBus.emit(e);
+    return updated;
   }
 
   async reviewAssignment(taskId: number, volunteerId: number, actorId: number, decision: 'APPROVED' | 'REJECTED' | 'REVISION_REQUESTED') {
-    return withTransaction(async (tx) => {
+    const eventsToEmit: any[] = [];
+    const updated = await withTransaction(async (tx) => {
       const current = await tx.taskAssignment.findUniqueOrThrow({
         where: { taskId_volunteerId: { taskId, volunteerId } }
       });
@@ -290,19 +314,19 @@ export class AssignmentService {
         dataToUpdate.completedAt = new Date();
       }
 
-      const updated = await tx.taskAssignment.update({
+      const updatedAssignment = await tx.taskAssignment.update({
         where: { taskId_volunteerId: { taskId, volunteerId } },
         data: dataToUpdate
       });
 
       // Recalculate parent Task status atomically
-      await this.checkAndDeriveTaskStatus(taskId, tx, actorId);
+      await this.checkAndDeriveTaskStatus(taskId, tx, actorId, eventsToEmit);
 
       const eventType = decision === 'APPROVED' ? DOMAIN_EVENTS.ASSIGNMENT_APPROVED :
                         decision === 'REVISION_REQUESTED' ? DOMAIN_EVENTS.ASSIGNMENT_REVISION_REQUESTED : null;
 
       if (eventType) {
-        await domainEventBus.emit({
+        eventsToEmit.push({
           metadata: { timestamp: new Date(), actorId },
           type: eventType,
           payload: {
@@ -316,7 +340,7 @@ export class AssignmentService {
         });
       }
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
         payload: {
@@ -329,28 +353,32 @@ export class AssignmentService {
         }
       });
 
-      return updated;
+      return updatedAssignment;
     });
+
+    for (const e of eventsToEmit) await domainEventBus.emit(e);
+    return updated;
   }
 
   async removeAssignment(taskId: number, volunteerId: number, actorId: number) {
-    return withTransaction(async (tx) => {
+    const eventsToEmit: any[] = [];
+    const updated = await withTransaction(async (tx) => {
       const current = await tx.taskAssignment.findUnique({
         where: { taskId_volunteerId: { taskId, volunteerId } }
       });
-      if (!current) return;
+      if (!current) return undefined;
 
       const newStatus = assignmentStateMachine.transition(current.status, AssignmentStatus.CANCELLED);
 
-      const updated = await tx.taskAssignment.update({
+      const updatedAssignment = await tx.taskAssignment.update({
         where: { taskId_volunteerId: { taskId, volunteerId } },
         data: { status: newStatus }
       });
 
       // Recalculate parent Task status atomically
-      await this.checkAndDeriveTaskStatus(taskId, tx, actorId);
+      await this.checkAndDeriveTaskStatus(taskId, tx, actorId, eventsToEmit);
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_CANCELLED,
         payload: {
@@ -363,7 +391,7 @@ export class AssignmentService {
         }
       });
 
-      await domainEventBus.emit({
+      eventsToEmit.push({
         metadata: { timestamp: new Date(), actorId },
         type: DOMAIN_EVENTS.ASSIGNMENT_STATUS_CHANGED,
         payload: {
@@ -376,11 +404,16 @@ export class AssignmentService {
         }
       });
 
-      return updated;
+      return updatedAssignment;
     });
+
+    if (updated) {
+      for (const e of eventsToEmit) await domainEventBus.emit(e);
+    }
+    return updated;
   }
 
-  public async checkAndDeriveTaskStatus(taskId: number, tx: Prisma.TransactionClient, actorId: number) {
+  public async checkAndDeriveTaskStatus(taskId: number, tx: Prisma.TransactionClient, actorId: number, eventsToEmit: any[] = []) {
     // Add PostgreSQL row locking to serialize status derivation checks on the same task
     await tx.$executeRaw`SELECT 1 FROM tasks WHERE id = ${taskId} FOR UPDATE`;
 
@@ -419,7 +452,7 @@ export class AssignmentService {
           data: { taskStatus: TaskStatus.IN_REVIEW }
         });
 
-        await domainEventBus.emit({
+        eventsToEmit.push({
           metadata: { timestamp: new Date(), actorId },
           type: DOMAIN_EVENTS.TASK_STATUS_DERIVED,
           payload: {
@@ -441,7 +474,7 @@ export class AssignmentService {
           data: { taskStatus: TaskStatus.IN_PROGRESS }
         });
 
-        await domainEventBus.emit({
+        eventsToEmit.push({
           metadata: { timestamp: new Date(), actorId },
           type: DOMAIN_EVENTS.TASK_STATUS_DERIVED,
           payload: {

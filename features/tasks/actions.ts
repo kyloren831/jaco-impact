@@ -3,8 +3,13 @@ import { initializeDomainEvents } from "@/domain/shared/init";
 initializeDomainEvents();
 
 import { requireRole } from "@/lib/auth/guards";
-import { taskDomainService } from "@/domain/tasks/service";
-import { volunteerDomainService } from "@/domain/volunteers/service";
+import { TaskDomainService } from "@/domain/tasks/service";
+import { VolunteerDomainService } from "@/domain/volunteers/service";
+import { TaskPrismaRepository } from "@/infrastructure/prisma/repositories/task.prisma-repository";
+import { VolunteerPrismaRepository } from "@/infrastructure/prisma/repositories/volunteer.prisma-repository";
+
+const taskDomainService = new TaskDomainService(new TaskPrismaRepository());
+const volunteerDomainService = new VolunteerDomainService(new VolunteerPrismaRepository());
 import { AssignmentService } from "@/domain/assignments/service";
 
 const assignmentService = new AssignmentService();

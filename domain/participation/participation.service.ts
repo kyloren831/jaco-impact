@@ -19,7 +19,7 @@ export class ParticipationService {
   ) {}
 
   async registerToEvent(eventId: number, volunteerId: number): Promise<EventParticipation> {
-    return withTransaction(async (tx) => {
+    const result = await withTransaction(async (tx) => {
       const event = await tx.event.findUnique({
         where: { id: eventId },
         select: { status: true, volunteersNeeded: true, name: true }
@@ -70,28 +70,30 @@ export class ParticipationService {
         }
       });
 
-      // Emit domain event
-      await domainEventBus.emit({
-        type: DOMAIN_EVENTS.VOLUNTEER_REGISTERED,
-        payload: {
-          eventId,
-          volunteerId,
-          eventName: event.name,
-          volunteerName: volunteer.user.name
-        },
-        metadata: {
-          actorId: volunteer.userId,
-          timestamp: new Date(),
-          correlationId: `register-${eventId}-${volunteerId}`
-        }
-      });
-
-      return participation;
+      return { participation, event, volunteer };
     });
+
+    // Emit domain event
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.VOLUNTEER_REGISTERED,
+      payload: {
+        eventId,
+        volunteerId,
+        eventName: result.event.name,
+        volunteerName: result.volunteer.user.name
+      },
+      metadata: {
+        actorId: result.volunteer.userId,
+        timestamp: new Date(),
+        correlationId: `register-${eventId}-${volunteerId}`
+      }
+    });
+
+    return result.participation;
   }
 
   async unregisterFromEvent(eventId: number, volunteerId: number): Promise<EventParticipation> {
-    return withTransaction(async (tx) => {
+    const result = await withTransaction(async (tx) => {
       const existingParticipation = await this.repository.findByEventAndVolunteer(eventId, volunteerId, tx);
       const hasActiveAssignments = await this.repository.hasActiveAssignments(eventId, volunteerId, tx);
       
@@ -131,26 +133,28 @@ export class ParticipationService {
         }
       });
 
-      // Emit domain event
-      await domainEventBus.emit({
-        type: DOMAIN_EVENTS.VOLUNTEER_UNREGISTERED,
-        payload: {
-          eventId,
-          volunteerId
-        },
-        metadata: {
-          actorId: volunteer.userId,
-          timestamp: new Date(),
-          correlationId: `unregister-${eventId}-${volunteerId}`
-        }
-      });
-
-      return participation;
+      return { participation, volunteer };
     });
+
+    // Emit domain event
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.VOLUNTEER_UNREGISTERED,
+      payload: {
+        eventId,
+        volunteerId
+      },
+      metadata: {
+        actorId: result.volunteer.userId,
+        timestamp: new Date(),
+        correlationId: `unregister-${eventId}-${volunteerId}`
+      }
+    });
+
+    return result.participation;
   }
 
   async markAttendance(eventId: number, volunteerId: number, attended: boolean, actorId: number): Promise<EventParticipation> {
-    return withTransaction(async (tx) => {
+    const result = await withTransaction(async (tx) => {
       const existingParticipation = await this.repository.findByEventAndVolunteer(eventId, volunteerId, tx);
       
       if (!existingParticipation || existingParticipation.status === 'CANCELLED') {
@@ -174,22 +178,24 @@ export class ParticipationService {
         }
       });
 
-      await domainEventBus.emit({
-        type: DOMAIN_EVENTS.ATTENDANCE_MARKED,
-        payload: {
-          eventId,
-          volunteerId,
-          status: newStatus
-        },
-        metadata: {
-          actorId,
-          timestamp: new Date(),
-          correlationId: `attendance-${eventId}-${volunteerId}`
-        }
-      });
-
-      return participation;
+      return { participation, newStatus };
     });
+
+    await domainEventBus.emit({
+      type: DOMAIN_EVENTS.ATTENDANCE_MARKED,
+      payload: {
+        eventId,
+        volunteerId,
+        status: result.newStatus
+      },
+      metadata: {
+        actorId,
+        timestamp: new Date(),
+        correlationId: `attendance-${eventId}-${volunteerId}`
+      }
+    });
+
+    return result.participation;
   }
 
   async getEventVolunteers(eventId: number) {

@@ -1,7 +1,10 @@
 "use server";
 
 import { requireAuth } from "@/lib/auth/guards";
-import { userDomainService } from "@/domain/users/service";
+import { UserDomainService } from "@/domain/users/service";
+import { UserPrismaRepository } from "@/infrastructure/prisma/repositories/user.prisma-repository";
+
+const userDomainService = new UserDomainService(new UserPrismaRepository());
 import { revalidatePath } from "next/cache";
 import { getPresignedUploadUrl } from "@/lib/storage/r2";
 import { prisma } from "@/lib/prisma";

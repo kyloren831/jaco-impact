@@ -1,4 +1,5 @@
 import { getAdminPymeDetailAction } from "@/features/pymes/actions";
+import Image from 'next/image';
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Clock, Store, User, Phone, MapPin } from "lucide-react";
@@ -67,7 +68,7 @@ export default async function AdminPymeDetailPage({
                   <div key={product.id} className="flex gap-4 border border-gray-100 dark:border-gray-700 rounded-lg p-3">
                     <div className="w-20 h-20 bg-gray-100 dark:bg-gray-900 rounded-md overflow-hidden flex-shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                      <Image src={product.imageUrl} alt={product.name} width={400} height={300} className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <h4 className="font-medium text-sm text-gray-900 dark:text-white line-clamp-1">{product.name}</h4>

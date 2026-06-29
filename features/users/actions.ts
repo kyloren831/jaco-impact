@@ -52,19 +52,21 @@ export async function updateUserRoles(userId: number, newRoles: string[]) {
   try {
     // Para Prisma, si newRoles es un array de strings (Role enums)
     // Primero, borramos los roles anteriores
-    await prisma.userRole.deleteMany({
-      where: { userId },
-    });
-
-    // Luego insertamos los nuevos
-    if (newRoles.length > 0) {
-      await prisma.userRole.createMany({
-        data: newRoles.map((r) => ({
-          userId,
-          role: r as any, // as Role enum
-        })),
+    await prisma.$transaction(async (tx) => {
+      await tx.userRole.deleteMany({
+        where: { userId },
       });
-    }
+
+      // Luego insertamos los nuevos
+      if (newRoles.length > 0) {
+        await tx.userRole.createMany({
+          data: newRoles.map((r) => ({
+            userId,
+            role: r as any, // as Role enum
+          })),
+        });
+      }
+    });
 
     revalidatePath("/dashboard/admin/users");
     return { success: true };
@@ -85,18 +87,20 @@ export async function createUser(data: { name: string; email: string; password?:
 
     const hashedPassword = await bcrypt.hash(data.password || "JacoImpact2026!", 10);
 
-    const created = await prisma.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        password: hashedPassword,
-        isActive: true,
-        userRoles: {
-          create: {
-            role: data.role as any,
+    const created = await prisma.$transaction(async (tx) => {
+      return await tx.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          password: hashedPassword,
+          isActive: true,
+          userRoles: {
+            create: {
+              role: data.role as any,
+            },
           },
         },
-      },
+      });
     });
 
     const { domainEventBus } = await import('@/domain/shared/domain-event-bus');
@@ -123,7 +127,9 @@ export async function createUser(data: { name: string; email: string; password?:
 export async function getCurrentUserAction() {
   try {
     const session = await requireAuth();
-    const { userDomainService } = await import("@/domain/users/service");
+    const { UserDomainService } = await import("@/domain/users/service");
+    const { UserPrismaRepository } = await import("@/infrastructure/prisma/repositories/user.prisma-repository");
+    const userDomainService = new UserDomainService(new UserPrismaRepository());
     const user = await userDomainService.getCurrentUser(session.userId);
     return { success: true as const, data: user };
   } catch (error) {

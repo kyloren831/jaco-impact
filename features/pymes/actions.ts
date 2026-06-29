@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 export async function getAdminPymesAction() {
   await requireRole(["ADMIN"]);
   const pymes = await prisma.pyme.findMany({
+    take: 50,
     include: {
       manager: {
         include: {

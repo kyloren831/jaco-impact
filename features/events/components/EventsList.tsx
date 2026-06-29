@@ -13,8 +13,11 @@ interface EventsListProps {
 
 export function EventsList({ events, project, onUpdateEvents, onEventClick }: EventsListProps) {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+  const [isUpdating, setIsUpdating] = useState<number | null>(null);
 
   const handleChangeStatus = async (eventId: number, newStatus: string) => {
+    if (isUpdating === eventId) return;
+    setIsUpdating(eventId);
     setActiveDropdown(null);
 
     const eventToUpdate = events.find((ev) => ev.id === eventId);
@@ -33,6 +36,7 @@ export function EventsList({ events, project, onUpdateEvents, onEventClick }: Ev
       onUpdateEvents(originalEvents);
       alert("Error al cambiar estado: " + res.error);
     }
+    setIsUpdating(null);
   };
 
   const getStatusInfo = (statusId: string) => {
@@ -136,7 +140,8 @@ export function EventsList({ events, project, onUpdateEvents, onEventClick }: Ev
                             <button
                               key={s.id}
                               onClick={() => handleChangeStatus(event.id, s.id)}
-                              className="px-3 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors"
+                              disabled={isUpdating === event.id}
+                              className="px-3 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2.5 transition-colors disabled:opacity-50"
                             >
                               <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }}></span>
                               {s.label}

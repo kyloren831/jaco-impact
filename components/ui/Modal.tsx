@@ -20,6 +20,9 @@ export default function Modal({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div 
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
         className={`bg-white dark:bg-gray-900 rounded-3xl w-full ${maxWidth} shadow-2xl overflow-hidden scale-in-center animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col`}
       >
         <div className="p-8 border-b border-gray-100 dark:border-gray-800 bg-[#F9F8F6] dark:bg-gray-800 sticky top-0 z-10 shrink-0 flex items-center justify-between">
@@ -30,7 +33,7 @@ export default function Modal({
               </div>
             )}
             <div>
-              <h2 className="font-headline text-2xl font-bold text-black dark:text-white">{title}</h2>
+              <h2 id="modal-title" className="font-headline text-2xl font-bold text-black dark:text-white">{title}</h2>
               {description && (
                 <p className="font-body text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {description}

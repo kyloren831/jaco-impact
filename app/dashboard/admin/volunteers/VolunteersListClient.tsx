@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from 'next/image';
 import { toggleVolunteerStatusAction } from "@/features/admin/volunteers/actions";
 import Link from "next/link";
 import { User, Mail, Phone, ShieldCheck, ShieldAlert, ArrowRight, Loader2, Search } from "lucide-react";
@@ -55,7 +56,7 @@ export default function VolunteersListClient({ initialVolunteers }: { initialVol
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 border-2 border-white dark:border-gray-800 shadow-sm">
                   {user.imageUrl ? (
-                    <img src={user.imageUrl} alt={user.name} className="w-full h-full object-cover" />
+                    <Image src={user.imageUrl} alt={user.name} width={400} height={300} className="w-full h-full object-cover" />
                   ) : (
                     <User className="w-full h-full p-2 text-gray-400" />
                   )}

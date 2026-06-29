@@ -43,7 +43,7 @@ export class VolunteerPrismaRepository implements IVolunteerRepository {
     return { user, volunteer };
   }
 
-  async findAll(tx?: Prisma.TransactionClient) {
+  async findAll(tx?: Prisma.TransactionClient, take?: number) {
     const client = tx || prisma;
     return client.volunteer.findMany({
       include: {
@@ -61,6 +61,7 @@ export class VolunteerPrismaRepository implements IVolunteerRepository {
           name: "asc",
         },
       },
+      take,
     });
   }
 }

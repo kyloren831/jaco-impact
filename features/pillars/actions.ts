@@ -3,7 +3,10 @@
 import { requireRole, requireAuth } from "@/lib/auth/guards";
 import { revalidatePath } from "next/cache";
 import { uploadFileToR2 } from "@/lib/storage/r2";
-import { pillarDomainService } from "@/domain/pillars/service";
+import { PillarDomainService } from "@/domain/pillars/service";
+import { PillarPrismaRepository } from "@/infrastructure/prisma/repositories/pillar.prisma-repository";
+
+const pillarDomainService = new PillarDomainService(new PillarPrismaRepository());
 import { DomainError } from "@/domain/shared/domain-error";
 
 export async function createPillar(formData: FormData) {

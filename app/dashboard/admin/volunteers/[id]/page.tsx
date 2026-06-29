@@ -1,4 +1,5 @@
 import { getVolunteerDetailAction } from "@/features/admin/volunteers/actions";
+import Image from 'next/image';
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { User, Mail, Phone, MapPin, Briefcase, Heart, Clock, AlertCircle, ArrowLeft, Calendar, ClipboardList, ShieldCheck, ShieldAlert } from "lucide-react";
@@ -57,7 +58,7 @@ export default async function VolunteerDetailPage({ params }: { params: Promise<
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8">
             <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-xl bg-gray-100 flex-shrink-0">
               {user.imageUrl ? (
-                <img src={user.imageUrl} alt={user.name} className="w-full h-full object-cover" />
+                <Image src={user.imageUrl} alt={user.name} width={400} height={300} className="w-full h-full object-cover" />
               ) : (
                 <User className="w-full h-full p-6 text-gray-400" />
               )}
